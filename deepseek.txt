@@ -1,0 +1,226 @@
+Blox Fruits Auto Farm (Sea 1 - Sea 3)
+
+```lua
+-- Blox Fruits Auto Farm All Sea
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Player = Players.LocalPlayer
+local Character = Player.Character
+local RootPart = Character:FindFirstChild("HumanoidRootPart")
+
+local Settings = {
+    AutoFarm = false,
+    SelectedMob = ""
+}
+
+-- GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 350, 0, 500)
+mainFrame.Position = UDim2.new(0, 10, 0, 10)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Text = "Blox Fruits Auto - All Sea"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = mainFrame
+
+-- Auto Farm Toggle
+local farmToggle = Instance.new("TextButton")
+farmToggle.Text = "🔰 Auto Farm: OFF"
+farmToggle.Size = UDim2.new(0.9, 0, 0, 40)
+farmToggle.Position = UDim2.new(0.05, 0, 0.08, 0)
+farmToggle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+farmToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+farmToggle.Parent = mainFrame
+
+farmToggle.MouseButton1Click:Connect(function()
+    Settings.AutoFarm = not Settings.AutoFarm
+    farmToggle.Text = Settings.AutoFarm and "🔰 Auto Farm: ON" or "🔰 Auto Farm: OFF"
+    farmToggle.BackgroundColor3 = Settings.AutoFarm and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(80, 80, 80)
+    if Settings.AutoFarm then StartAutoFarm() end
+end)
+
+-- Sea 1 Mobs
+local sea1Label = Instance.new("TextLabel")
+sea1Label.Text = "=== SEA 1 ==="
+sea1Label.Size = UDim2.new(0.9, 0, 0, 25)
+sea1Label.Position = UDim2.new(0.05, 0, 0.2, 0)
+sea1Label.BackgroundColor3 = Color3.fromRGB(0, 80, 120)
+sea1Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+sea1Label.Parent = mainFrame
+
+local mobsSea1 = {"Bandit", "Monkey", "Pirate", "Brute", "Desert Bandit"}
+local yPos = 0.26
+
+for i, mob in pairs(mobsSea1) do
+    local btn = Instance.new("TextButton")
+    btn.Text = "🎯 " .. mob
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, yPos, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Parent = mainFrame
+    
+    btn.MouseButton1Click:Connect(function()
+        Settings.SelectedMob = mob
+        farmToggle.Text = "🔰 Auto Farm: " .. mob
+    end)
+    
+    yPos = yPos + 0.07
+end
+
+-- Sea 2 Mobs
+local sea2Label = Instance.new("TextLabel")
+sea2Label.Text = "=== SEA 2 ==="
+sea2Label.Size = UDim2.new(0.9, 0, 0, 25)
+sea2Label.Position = UDim2.new(0.05, 0, 0.55, 0)
+sea2Label.BackgroundColor3 = Color3.fromRGB(0, 120, 80)
+sea2Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+sea2Label.Parent = mainFrame
+
+local mobsSea2 = {"Raider", "Mercenary", "Snow Bandit", "Chief Petty Officer"}
+yPos = 0.61
+
+for i, mob in pairs(mobsSea2) do
+    local btn = Instance.new("TextButton")
+    btn.Text = "🎯 " .. mob
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, yPos, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 100, 60)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Parent = mainFrame
+    
+    btn.MouseButton1Click:Connect(function()
+        Settings.SelectedMob = mob
+        farmToggle.Text = "🔰 Auto Farm: " .. mob
+    end)
+    
+    yPos = yPos + 0.07
+end
+
+-- Sea 3 Mobs
+local sea3Label = Instance.new("TextLabel")
+sea3Label.Text = "=== SEA 3 ==="
+sea3Label.Size = UDim2.new(0.9, 0, 0, 25)
+sea3Label.Position = UDim2.new(0.05, 0, 0.8, 0)
+sea3Label.BackgroundColor3 = Color3.fromRGB(120, 0, 80)
+sea3Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+sea3Label.Parent = mainFrame
+
+local mobsSea3 = {"Pirate Millionaire", "Dragon Crew", "Fishman"}
+yPos = 0.86
+
+for i, mob in pairs(mobsSea3) do
+    local btn = Instance.new("TextButton")
+    btn.Text = "🎯 " .. mob
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, yPos, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(100, 60, 100)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Parent = mainFrame
+    
+    btn.MouseButton1Click:Connect(function()
+        Settings.SelectedMob = mob
+        farmToggle.Text = "🔰 Auto Farm: " .. mob
+    end)
+    
+    yPos = yPos + 0.07
+end
+
+-- Auto Farm Function
+function StartAutoFarm()
+    spawn(function()
+        while Settings.AutoFarm do
+            local nearestMob = nil
+            local nearestDist = 100
+            
+            for _, mob in pairs(Workspace.Enemies:GetChildren()) do
+                if mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                    if Settings.SelectedMob == "" or string.find(mob.Name, Settings.SelectedMob) then
+                        local dist = (RootPart.Position - mob.HumanoidRootPart.Position).Magnitude
+                        if dist < nearestDist then
+                            nearestMob = mob
+                            nearestDist = dist
+                        end
+                    end
+                end
+            end
+            
+            if nearestMob then
+                Character:WaitForChild("Humanoid"):MoveTo(nearestMob.HumanoidRootPart.Position)
+                wait(0.3)
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AttackButton")
+            else
+                -- Tự động tìm mob gần nhất nếu không có mob được chọn
+                if Settings.SelectedMob == "" then
+                    for _, mob in pairs(Workspace.Enemies:GetChildren()) do
+                        if mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                            local dist = (RootPart.Position - mob.HumanoidRootPart.Position).Magnitude
+                            if dist < nearestDist then
+                                nearestMob = mob
+                                nearestDist = dist
+                            end
+                        end
+                    end
+                end
+            end
+            
+            wait(0.1)
+        end
+    end)
+end
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Text = "❌"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Parent = mainFrame
+
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Drag GUI
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+print("Blox Fruits Auto All Sea Loaded!")
