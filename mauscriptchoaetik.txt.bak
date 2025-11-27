@@ -11,7 +11,7 @@ local CheckButton = Instance.new("TextButton")
 local GetKeyButton = Instance.new("TextButton")
 local UICorner = Instance.new("UICorner")
 
-ScreenGui.Name = "KeySystem"
+ScreenGui.Name = "Nhập Key"
 ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
