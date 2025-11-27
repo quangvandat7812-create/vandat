@@ -46,7 +46,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs
     })
 end
 
-Tabs.Main:Button({
+    Tabs.Main:Button({
         Title = "W-AZUZE👇",
         Callback = function()
             loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
@@ -54,7 +54,7 @@ Tabs.Main:Button({
     })
 end
 
-Tabs.Main:Button({
+    Tabs.Main:Button({
         Title = "TRẨU V4👇",
         Callback = function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()
@@ -62,7 +62,7 @@ Tabs.Main:Button({
     })
 end
 
-Tabs.Main:Button({
+    Tabs.Main:Button({
         Title = "VANDATSCIPT👇",
         Callback = function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/mauscriptchoaetik.txt.bak", true))()
