@@ -74,6 +74,4 @@ Tabs.Main:Button({
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/mauscriptchoaetik.txt.bak"))()
     end
-})        end
-    })
-end
+})
