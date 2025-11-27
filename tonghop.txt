@@ -72,6 +72,6 @@ Tabs.Main:Button({
 Tabs.Main:Button({
     Title = "VANDATSCIPT👇",
     Callback = function()
-        
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/scriptmoinhat.lua.txt.bak"))()
     end
 })
