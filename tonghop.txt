@@ -1,0 +1,118 @@
+--🔹 Load WindUI
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/teoscrvn/T-ng-h-p-/refs/heads/main/Script%20test%20(1).txt"))()
+
+--🔹 Tạo Window
+local Window = WindUI:CreateWindow({
+    Title = "TÉO HUB",
+    Size = UDim2.fromOffset(580, 340),
+    Theme = "Dark",
+    Transparent = true
+})
+Window:EditOpenButton({
+    Title = "Téo hub vng🇻🇳",
+    Icon = "monitor", -- hoặc icon khác
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0F7B"),
+        Color3.fromHex("F89B29")
+    ),
+    Draggable = true,
+})
+
+-- 📑 Các tab (mục chính)
+local Tabs = {
+	Main0 = Window:AddTab({ Title = "TikTok" }),  -- 👈 đổi tên tab 1
+	Main1 = Window:AddTab({ Title = "Cướp Thối Não" }),     -- 👈 đổi tên tab 3
+	Main2 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
+	Main3 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
+}
+
+------------------------------------------------
+-- TAB 1: Các kênh tiktok
+------------------------------------------------
+Tabs.Main0:AddButton({
+	Title = "tiktok bạn:)",              -- 👈 tên nút
+	Description = "oách xà lách vô cùng",-- 👈 mô tả nút
+	Callback = function()
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa")  -- 👈 link sao chép
+	end
+})
+
+Tabs.Main0:AddButton({
+	Title = "tik",
+	Description = "làm chơi thui",
+	Callback = function()
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa")     -- 👈 link khác
+	end
+})
+
+Tabs.Main0:AddButton({
+	Title = "tiktok",
+	Description = "fl tiktok để biết thêm nhiều script",
+	Callback = function()
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa")
+	end
+})
+
+------------------------------------------------
+-- TAB 2: Ví dụ thêm script
+------------------------------------------------
+Tabs.Main3:AddButton({
+	Title = "W-azuze",                             -- 👈 tên nút hiển thị
+	Description = "Fam Ngon",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "ZisHub",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "Min v5",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://github.com/LuaCrack/Min/raw/refs/heads/main/MinVnV5"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "Trẩu V4",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "XeterHub",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		getgenv().Version = "V4"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "PvP Vip",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ParadozCode/CentuDox-Hub-Paradoz-Hub/refs/heads/main/CentudoxLoader.xyz", true))()
+     end
+})
+
+Tabs.Main1:AddButton({
+	Title = "Chx Có Script",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		Title = "Chx Có Script"
+     end
+})
