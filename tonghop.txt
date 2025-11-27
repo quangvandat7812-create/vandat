@@ -3,14 +3,14 @@ local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/teoscr
 
 --🔹 Tạo Window
 local Window = WindUI:CreateWindow({
-    Title = "VD HUB",
+    Title = "VD HUB☠️",
     Size = UDim2.fromOffset(580, 340),
     Theme = "Dark",
     Transparent = true
 })
 
 Window:EditOpenButton({
-    Title = "VanDatscript",
+    Title = "VanDatscript👾",
     Icon = "monitor",
     CornerRadius = UDim.new(0,16),
     StrokeThickness = 2,
@@ -22,20 +22,20 @@ Window:EditOpenButton({
 })
 
 local Tabs = {
-    Main = Window:Tab({Title = "Chung"})
+    Main = Window:Tab({Title = "Blox fruit"})
 }
 
 -- Nút 1
 Tabs.Main:Button({
     Title = "Hello",
     Callback = function()
-        print("Chức năng chung – game nào cũng có")
+        print("Chỉ Blox Fruit")
     end
 })
 
 -- Nút 2 (copy link TikTok)
 Tabs.Main:Button({
-    Title = "TikTok",
+    Title = "TikTok👇",
     Callback = function()
         setclipboard("https://www.tiktok.com/@vandat.script?_r=1&_t=ZS-91kXxZa7U2s")
         print("Đã copy link TikTok vào clipboard!")
@@ -72,6 +72,6 @@ Tabs.Main:Button({
 Tabs.Main:Button({
     Title = "VANDATSCIPT👇",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/mauscriptchoaetik.txt.bak"))()
+        
     end
 })
