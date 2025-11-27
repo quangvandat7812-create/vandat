@@ -179,14 +179,14 @@ Tabs.Main4:AddButton({
 	Title = "Zis Hub",                             -- 👈 tên nút hiển thị
 	Description = "Fam Ngon",-- 👈 mô tả
 	Callback = function()
-	loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
 	end
 })
 
-Tabs.Main4:AddButton({
+Tabs.Main3:AddButton({
 	Title = "w-azezu",                             -- 👈 tên nút hiển thị
 	Description = "tiktok:vanwdatcaythue✅️",-- 👈 mô tả
 	Callback = function()
-	loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
 	end
 })
