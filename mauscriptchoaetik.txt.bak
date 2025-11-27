@@ -181,3 +181,11 @@ Tabs.Main4:AddButton({
 		loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
      end
 })
+
+Tabs.Main4:AddButton({
+	Title = "ZisHub",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+     end
+})
