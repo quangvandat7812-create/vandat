@@ -121,7 +121,7 @@ UICorner.CornerRadius = UDim.new(1, 10)
 UICorner.Parent = ImageButton
 
 ImageButton.MouseButton1Down:Connect(function()
-	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.M, false, game)
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.End, false, game)
 end)
 
 -- 🟣 Giao diện Fluent
@@ -179,7 +179,7 @@ Tabs.Main4:AddButton({
 	Title = "Zis Hub",                             -- 👈 tên nút hiển thị
 	Description = "Fam Ngon",-- 👈 mô tả
 	Callback = function()
-	loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
 	end
 })
 
@@ -187,6 +187,6 @@ Tabs.Main4:AddButton({
 	Title = "w-azezu",                             -- 👈 tên nút hiển thị
 	Description = "tiktok:vanwdatcaythue✅️",-- 👈 mô tả
 	Callback = function()
-	loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
 	end
 })
