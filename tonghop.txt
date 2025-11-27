@@ -8,9 +8,10 @@ local Window = WindUI:CreateWindow({
     Theme = "Dark",
     Transparent = true
 })
+
 Window:EditOpenButton({
     Title = "VanDatscript",
-    Icon = "monitor", -- hoặc icon khác
+    Icon = "monitor",
     CornerRadius = UDim.new(0,16),
     StrokeThickness = 2,
     Color = ColorSequence.new(
@@ -21,51 +22,58 @@ Window:EditOpenButton({
 })
 
 local Tabs = {
-        Main = Window:Tab({Title = "Chung"})
-    }
-    Tabs.Main:Button({
-        Title = "Hello",
-        Callback = function()
-            print("Chức năng chung – game nào cũng có")
-        end
-    })
-    Tabs.Main:Button({
-        Title = "TikTok",
-        Callback = function()
-            https://www.tiktok.com/@vandat.script?_r=1&_t=ZS-91kXxZa7U2s
-        end
-    })
-end
-    Tabs.Main:Button({
-        Title = "Xeterv4👇",
-        Callback = function()
-            	getgenv().Version = "V4"
-getgenv().Team = "Marines"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()
-        end
-    })
-end
+    Main = Window:Tab({Title = "Chung"})
+}
 
-    Tabs.Main:Button({
-        Title = "W-AZUZE👇",
-        Callback = function()
-            loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
-        end
-    })
-end
+-- Nút 1
+Tabs.Main:Button({
+    Title = "Hello",
+    Callback = function()
+        print("Chức năng chung – game nào cũng có")
+    end
+})
 
-    Tabs.Main:Button({
-        Title = "TRẨU V4👇",
-        Callback = function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()
-        end
-    })
-end
+-- Nút 2 (copy link TikTok)
+Tabs.Main:Button({
+    Title = "TikTok",
+    Callback = function()
+        setclipboard("https://www.tiktok.com/@vandat.script?_r=1&_t=ZS-91kXxZa7U2s")
+        print("Đã copy link TikTok vào clipboard!")
+    end
+})
 
-    Tabs.Main:Button({
-        Title = "VANDATSCIPT👇",
-        Callback = function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/mauscriptchoaetik.txt.bak", true))()
-        end
+-- Nút 3 Xeter
+Tabs.Main:Button({
+    Title = "Xeterv4👇",
+    Callback = function()
+        getgenv().Version = "V4"
+        getgenv().Team = "Marines"
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()
+    end
+})
+
+-- Nút 4 W-AZUZE
+Tabs.Main:Button({
+    Title = "W-AZUZE👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+    end
+})
+
+-- Nút 5 TRẨU V4
+Tabs.Main:Button({
+    Title = "TRẨU V4👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()
+    end
+})
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "VANDATSCIPT👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/mauscriptchoaetik.txt.bak"))()
+    end
+})        end
     })
 end
