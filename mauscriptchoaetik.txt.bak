@@ -110,13 +110,13 @@ ImageButton.BorderSizePixel = 0
 ImageButton.Position = UDim2.new(0.10615778, 0, 0.16217947, 0)
 ImageButton.Size = UDim2.new(0, 40, 0, 40)
 ImageButton.Draggable = true
-ImageButton.Image = "136782721605859"  -- 👈 đổi ID ảnh nút mở menu tại đây (ảnh roblox)
+ImageButton.Image = "130419800341744"  -- 👈 đổi ID ảnh nút mở menu tại đây (ảnh roblox)
 
 UICorner.CornerRadius = UDim.new(1, 10)
 UICorner.Parent = ImageButton
 
 ImageButton.MouseButton1Down:Connect(function()
-	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.End, false, game)
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.L, false, game)
 end)
 
 -- 🟣 Giao diện Fluent
@@ -130,18 +130,16 @@ local Window = Fluent:CreateWindow({
 	TabWidth = 157,
 	Size = UDim2.fromOffset(450, 300),
 	Acrylic = true,
-	Theme = "Aqua",                   -- 👈 đổi màu chủ đạo: Amethyst, Dark, Aqua, Light,...
-	MinimizeKey = Enum.KeyCode.End
+	Theme = "Dark",                   -- 👈 đổi màu chủ đạo: Amethyst, Dark, Aqua, Light,...
+	MinimizeKey = Enum.KeyCode.L
 })
 
 -- 📑 Các tab (mục chính)
 local Tabs = {
-	Main0 = Window:AddTab({ Title = "một số kênh🤓" }),  -- 👈 đổi tên tab 1
-	Main1 = Window:AddTab({ Title = "" }),  -- 👈 đổi tên tab 2
-	Main2 = Window:AddTab({ Title = "bran rót💩" }),     -- 👈 đổi tên tab 3
-	Main3 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
-	Main4 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
-	Main5 = Window:AddTab({ Title = "" }) -- 👈 đổi tên tab 6
+	Main0 = Window:AddTab({ Title = "TikTok" }),  -- 👈 đổi tên tab 1
+	Main1 = Window:AddTab({ Title = "Cướp Thối Não" }),     -- 👈 đổi tên tab 3
+	Main2 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
+	Main3 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
 }
 
 ------------------------------------------------
@@ -174,7 +172,7 @@ Tabs.Main0:AddButton({
 ------------------------------------------------
 -- TAB 2: Ví dụ thêm script
 ------------------------------------------------
-Tabs.Main4:AddButton({
+Tabs.Main3:AddButton({
 	Title = "W-azuze",                             -- 👈 tên nút hiển thị
 	Description = "Fam Ngon",-- 👈 mô tả
 	Callback = function()
@@ -182,7 +180,7 @@ Tabs.Main4:AddButton({
      end
 })
 
-Tabs.Main4:AddButton({
+Tabs.Main3:AddButton({
 	Title = "ZisHub",                             -- 👈 tên nút hiển thị
 	Description = "VanDat Tong Hop",-- 👈 mô tả
 	Callback = function()
