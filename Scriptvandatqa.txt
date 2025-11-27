@@ -136,7 +136,7 @@ local Window = Fluent:CreateWindow({
 	Size = UDim2.fromOffset(450, 300),
 	Acrylic = true,
 	Theme = "Dark,                   -- 👈 đổi màu chủ đạo: Amethyst, Dark, Aqua, Light,...
-	MinimizeKey = Enum.KeyCode.End
+	MinimizeKey = Enum.KeyCode.M
 })
 
 -- 📑 Các tab (mục chính)
@@ -153,7 +153,7 @@ Tabs.Main0:AddButton({
 	Title = "tiktok bạn:)",              -- 👈 tên nút
 	Description = "oách xà lách vô cùng",-- 👈 mô tả nút
 	Callback = function()
-		setclipboard("https://www.tiktok.com/@jannie3342?_t=ZS-90QsJQ5j0NO&_r=1")  -- 👈 link sao chép
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa)  -- 👈 link sao chép
 	end
 })
 
@@ -161,15 +161,14 @@ Tabs.Main0:AddButton({
 	Title = "tik",
 	Description = "làm chơi thui",
 	Callback = function()
-		setclipboard("https://www.tiktok.com/@b.yt03?_t=ZS-90QsHokNlwN&_r=1")     -- 👈 link khác
-	end
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa
 })
 
 Tabs.Main0:AddButton({
 	Title = "tiktok",
 	Description = "fl tiktok để biết thêm nhiều script",
 	Callback = function()
-		setclipboard("https://www.tiktok.com/@b.yt03?_t=ZS-90QsHmSjaiu&_r=1")
+		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa")
 	end
 })
 
