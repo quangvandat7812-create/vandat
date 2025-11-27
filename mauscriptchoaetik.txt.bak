@@ -40,7 +40,7 @@ CloseButton.MouseButton1Click:Connect(function()
 end)
 TextBox.Parent = Frame
 TextBox.PlaceholderText = "Nhập key tại đây ✅️ "
-TextBox.Text = ""
+TextBox.Text = "Vanwdat"
 TextBox.Size = UDim2.new(0.9, 0, 0, 35)
 TextBox.Position = UDim2.new(0.05, 0, 0.25, 0)
 TextBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
@@ -65,7 +65,7 @@ GetKeyButton.MouseButton1Click:Connect(function()
 	setclipboard(keyLink)
 	game.StarterGui:SetCore("SendNotification", {
 		Title = "Đã copy link 🔗";
-		Text = "Dán lên trình duyệt để vượt link lấy key nhed!";
+		Text = "Dán lên trình duyệt để vượt link lấy key nhé!";
 		Duration = 4;
 	})
 end)
@@ -185,5 +185,48 @@ Tabs.Main3:AddButton({
 	Description = "VanDat Tong Hop",-- 👈 mô tả
 	Callback = function()
 		loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "Min v5",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://github.com/LuaCrack/Min/raw/refs/heads/main/MinVnV5"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "Trẩu V4",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "XeterHub",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		getgenv().Version = "V4"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()
+     end
+})
+
+Tabs.Main3:AddButton({
+	Title = "PvP Vip",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ParadozCode/CentuDox-Hub-Paradoz-Hub/refs/heads/main/CentudoxLoader.xyz", true))()
+     end
+})
+
+Tabs.Main1:AddButton({
+	Title = "Chx Có Script",                             -- 👈 tên nút hiển thị
+	Description = "VanDat Tong Hop",-- 👈 mô tả
+	Callback = function()
+		Title = "Chx Có Script"
      end
 })
