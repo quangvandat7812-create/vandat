@@ -1,6 +1,6 @@
 -- 1️⃣ KHAI BÁO KEY & LINK GET KEY
 local key = "quynhanh1312" -- Key bạn đặt
-local keyLink = "https://link4m.com/BPaTvj" -- Link khi ấn "Get Key"
+local keyLink = "https://link4sub.com/9S7B" -- Link khi ấn "Get Key"
 
 -- 2️⃣ GIAO DIỆN NHẬP KEY
 local CoreGui = game:GetService("CoreGui")
