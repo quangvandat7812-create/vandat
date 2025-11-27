@@ -1,0 +1,44 @@
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+
+       local Window = MakeWindow({
+         Hub = {
+         Title = "Vanwdat",
+         Animation = "TikTok:VanwDatcaythue✅️"
+         },
+        Key = {
+        KeySystem = true,
+        Title = "Dán key vào đây !",
+        Description = "",
+        KeyLink = "https://link4sub.com/9S7B",
+        Keys = {"quynhanh1312"},
+        Notifi = {
+        Notifications = true,
+        CorrectKey = "Running the Script...",
+       Incorrectkey = "The key is incorrect",
+       CopyKeyLink = "Copied to Clipboard"
+      }
+    }
+  })
+
+       MinimizeButton({
+       Image = "130419800341744",
+       Size = {60, 60},
+       Color = Color3.fromRGB(10, 10, 10),
+       Corner = true,
+       Stroke = false,
+       StrokeColor = Color3.fromRGB(255, 0, 0)
+      })
+      
+------ Tab
+     local Tab1o = MakeTab({Name = "Script Farm"})
+     
+------- BUTTON
+    
+    AddButton(Tab1o, {
+     Name = "W-AZUZE",
+    Callback = function()
+	  loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+  end
+  })/raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))(Settings)
+  end
+  })
