@@ -1,6 +1,6 @@
 -- 1️⃣ KHAI BÁO KEY & LINK GET KEY
 local key = "quynhanh1312" -- Key bạn đặt
-local keyLink = "https://www.tiktok.com/@b.yt03" -- Link khi ấn "Get Key"
+local keyLink = "https://link4m.com/BPaTvj" -- Link khi ấn "Get Key"
 
 -- 2️⃣ GIAO DIỆN NHẬP KEY
 local CoreGui = game:GetService("CoreGui")
@@ -39,7 +39,7 @@ CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy() -- ấn X sẽ tắt giao diện
 end)
 TextBox.Parent = Frame
-TextBox.PlaceholderText = "Nhập key tại đây 🍎"
+TextBox.PlaceholderText = "Nhập key tại đây ✅️ "
 TextBox.Text = ""
 TextBox.Size = UDim2.new(0.9, 0, 0, 35)
 TextBox.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -65,7 +65,7 @@ GetKeyButton.MouseButton1Click:Connect(function()
 	setclipboard(keyLink)
 	game.StarterGui:SetCore("SendNotification", {
 		Title = "Đã copy link 🔗";
-		Text = "Dán lên trình duyệt để lấy key nhé!";
+		Text = "Dán lên trình duyệt để vượt link lấy key nhed!";
 		Duration = 4;
 	})
 end)
@@ -121,7 +121,7 @@ UICorner.CornerRadius = UDim.new(1, 10)
 UICorner.Parent = ImageButton
 
 ImageButton.MouseButton1Down:Connect(function()
-	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.End, false, game)
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.M, false, game)
 end)
 
 -- 🟣 Giao diện Fluent
@@ -135,19 +135,16 @@ local Window = Fluent:CreateWindow({
 	TabWidth = 157,
 	Size = UDim2.fromOffset(450, 300),
 	Acrylic = true,
-	Theme = "Aqua",                   -- 👈 đổi màu chủ đạo: Amethyst, Dark, Aqua, Light,...
+	Theme = "Dark,                   -- 👈 đổi màu chủ đạo: Amethyst, Dark, Aqua, Light,...
 	MinimizeKey = Enum.KeyCode.End
 })
 
 -- 📑 Các tab (mục chính)
 local Tabs = {
-	Main0 = Window:AddTab({ Title = "một số kênh🤓" }),  -- 👈 đổi tên tab 1
-	Main1 = Window:AddTab({ Title = "CDVN☠️" }),  -- 👈 đổi tên tab 2
-	Main2 = Window:AddTab({ Title = "bran rót💩" }),     -- 👈 đổi tên tab 3
+	Main0 = Window:AddTab({ Title = "TikTok✅️" }),  -- 👈 đổi tên tab 1
+	Main2 = Window:AddTab({ Title = "Cướp brainrot" }),     -- 👈 đổi tên tab 3
 	Main3 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
 	Main4 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
-	Main5 = Window:AddTab({ Title = "plan vs branro🌲🐘t" }) -- 👈 đổi tên tab 6
-}
 
 ------------------------------------------------
 -- TAB 1: Các kênh tiktok
@@ -184,5 +181,13 @@ Tabs.Main4:AddButton({
 	Description = "Fam Ngon",-- 👈 mô tả
 	Callback = function()
 	loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+	end
+})
+
+Tabs.Main4:AddButton({
+	Title = "w-azezu",                             -- 👈 tên nút hiển thị
+	Description = "tiktok:vanwdatcaythue✅️",-- 👈 mô tả
+	Callback = function()
+	loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
 	end
 })
