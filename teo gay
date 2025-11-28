@@ -1,0 +1,109 @@
+--🔹 Load WindUI
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/teoscrvn/T-ng-h-p-/refs/heads/main/Script%20test%20(1).txt"))()
+
+--🔹 Tạo Window
+local Window = WindUI:CreateWindow({
+    Title = "TÉO HUB",
+    Size = UDim2.fromOffset(580, 340),
+    Theme = "Dark",
+    Transparent = true
+})
+Window:EditOpenButton({
+    Title = "Téo hub vng🇻🇳",
+    Icon = "monitor", -- hoặc icon khác
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0F7B"),
+        Color3.fromHex("F89B29")
+    ),
+    Draggable = true,
+})
+--🔹 GAME RIÊNG – DANH SÁCH
+local specialGames = {
+    [18159424181] = { -- Game 1: Fly
+        {
+            Title="Fly",
+            Type="Toggle",
+            Callback=function(state)
+                getgenv().flyMode = state
+                if state then
+                    print("Fly ON")
+                    task.spawn(function()
+                        while getgenv().flyMode do
+                            task.wait(0.1)
+                            local root = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if root then
+                                root.CFrame = root.CFrame + Vector3.new(0, 1, 0)
+                            end
+                        end
+                    end)
+                else
+                    print("Fly OFF")
+                end
+            end
+        }
+    },
+    [3082002798] = { -- Game 2: Nhảy liên tục
+        {
+            Title="Jump Hack",
+            Type="Toggle",
+            Callback=function(state)
+                getgenv().jumpHack = state
+                local humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if not humanoid then return end
+                if state then
+                    print("Jump Hack ON")
+                    task.spawn(function()
+                        while getgenv().jumpHack do
+                            task.wait(0.2)
+                            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        end
+                    end)
+                else
+                    print("Jump Hack OFF")
+                end
+            end
+        }
+    }
+}
+
+local currentGame = game.PlaceId
+
+if specialGames[currentGame] then
+    -- 🔹 Nếu game có trong danh sách → tạo tab riêng cho game đó
+    local Tabs = {
+        Game = Window:Tab({Title = "Game Riêng"})
+    }
+    for _, item in ipairs(specialGames[currentGame]) do
+        if item.Type == "Toggle" then
+            Tabs.Game:Toggle({
+                Title = item.Title,
+                Callback = item.Callback
+            })
+        else
+            Tabs.Game:Button({
+                Title = item.Title,
+                Callback = item.Callback
+            })
+        end
+    end
+else
+    -- 🔹 Game không có trong danh sách → hiển thị tab chung
+    local Tabs = {
+        Main = Window:Tab({Title = "Chung"})
+    }
+    Tabs.Main:Button({
+        Title = "Hello",
+        Callback = function()
+            print("Chức năng chung – game nào cũng có")
+        end
+    })
+    Tabs.Main:Button({
+        Title = "Copy PlaceId",
+        Callback = function()
+            setclipboard(tostring(game.PlaceId))
+            print("PlaceId copied:", game.PlaceId)
+        end
+    })
+end
