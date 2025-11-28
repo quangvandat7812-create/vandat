@@ -75,3 +75,20 @@ Tabs.Main:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/scriptmoinhat.lua.txt.bak"))()
     end
 })
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "HOPSERVER👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xSync-gg/VisionX/refs/heads/main/Server_Finder.lua"))()
+    end
+})
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "DATTH👇",
+    Callback = function()
+        getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://github.com/LuaCrack/DatThg/raw/refs/heads/main/DatThgVnV4"))()
+    end
+})
