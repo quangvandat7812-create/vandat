@@ -92,3 +92,19 @@ Tabs.Main:Button({
 loadstring(game:HttpGet("https://github.com/LuaCrack/DatThg/raw/refs/heads/main/DatThgVnV4"))()
     end
 })
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "ZIS GAMING👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
+    end
+})
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "NGOCBONG👇",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ngocbonggaming/script/refs/heads/main/NgocBongVn.lua"))()
+    end
+})
