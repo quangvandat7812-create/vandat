@@ -108,3 +108,12 @@ Tabs.Main:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ngocbonggaming/script/refs/heads/main/NgocBongVn.lua"))()
     end
 })
+
+-- Nút 6 VanDatScript
+Tabs.Main:Button({
+    Title = "Maru👇",
+    Callback = function()
+        getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/natoppo044/GGEZ/refs/heads/main/MaruHub.lua"))()
+    end
+})
