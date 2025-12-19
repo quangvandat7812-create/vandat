@@ -1,70 +1,75 @@
-Blox Fruits Auto Farm (Sea 1 - Sea 3)
+-- ✈️ Fly Script (Safe)
+-- For your own Roblox game
 
-```lua
--- Blox Fruits Auto Farm All Sea
 local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local Player = Players.LocalPlayer
-local Character = Player.Character
-local RootPart = Character:FindFirstChild("HumanoidRootPart")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-local Settings = {
-    AutoFarm = false,
-    SelectedMob = ""
-}
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local humanoid = char:WaitForChild("Humanoid")
 
--- GUI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local flying = false
+local speed = 60
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 350, 0, 500)
-mainFrame.Position = UDim2.new(0, 10, 0, 10)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.Parent = screenGui
+local bv, bg
+local move = {f=0,b=0,l=0,r=0,u=0,d=0}
 
-local title = Instance.new("TextLabel")
-title.Text = "Blox Fruits Auto - All Sea"
-title.Size = UDim2.new(1, 0, 0, 30)
-title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Parent = mainFrame
+-- Bắt phím
+UIS.InputBegan:Connect(function(input,gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.F then
+		flying = not flying
 
--- Auto Farm Toggle
-local farmToggle = Instance.new("TextButton")
-farmToggle.Text = "🔰 Auto Farm: OFF"
-farmToggle.Size = UDim2.new(0.9, 0, 0, 40)
-farmToggle.Position = UDim2.new(0.05, 0, 0.08, 0)
-farmToggle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-farmToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-farmToggle.Parent = mainFrame
+		if flying then
+			humanoid.PlatformStand = true
 
-farmToggle.MouseButton1Click:Connect(function()
-    Settings.AutoFarm = not Settings.AutoFarm
-    farmToggle.Text = Settings.AutoFarm and "🔰 Auto Farm: ON" or "🔰 Auto Farm: OFF"
-    farmToggle.BackgroundColor3 = Settings.AutoFarm and Color3.fromRGB(0, 100, 0) or Color3.fromRGB(80, 80, 80)
-    if Settings.AutoFarm then StartAutoFarm() end
+			bv = Instance.new("BodyVelocity", hrp)
+			bv.MaxForce = Vector3.new(1e9,1e9,1e9)
+
+			bg = Instance.new("BodyGyro", hrp)
+			bg.MaxTorque = Vector3.new(1e9,1e9,1e9)
+			bg.P = 9e4
+		else
+			humanoid.PlatformStand = false
+			if bv then bv:Destroy() end
+			if bg then bg:Destroy() end
+		end
+	end
+
+	if input.KeyCode == Enum.KeyCode.W then move.f=1 end
+	if input.KeyCode == Enum.KeyCode.S then move.b=1 end
+	if input.KeyCode == Enum.KeyCode.A then move.l=1 end
+	if input.KeyCode == Enum.KeyCode.D then move.r=1 end
+	if input.KeyCode == Enum.KeyCode.Space then move.u=1 end
+	if input.KeyCode == Enum.KeyCode.LeftControl then move.d=1 end
 end)
 
--- Sea 1 Mobs
-local sea1Label = Instance.new("TextLabel")
-sea1Label.Text = "=== SEA 1 ==="
-sea1Label.Size = UDim2.new(0.9, 0, 0, 25)
-sea1Label.Position = UDim2.new(0.05, 0, 0.2, 0)
-sea1Label.BackgroundColor3 = Color3.fromRGB(0, 80, 120)
-sea1Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-sea1Label.Parent = mainFrame
+UIS.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W then move.f=0 end
+	if input.KeyCode == Enum.KeyCode.S then move.b=0 end
+	if input.KeyCode == Enum.KeyCode.A then move.l=0 end
+	if input.KeyCode == Enum.KeyCode.D then move.r=0 end
+	if input.KeyCode == Enum.KeyCode.Space then move.u=0 end
+	if input.KeyCode == Enum.KeyCode.LeftControl then move.d=0 end
+end)
 
-local mobsSea1 = {"Bandit", "Monkey", "Pirate", "Brute", "Desert Bandit"}
-local yPos = 0.26
+-- Bay
+RunService.RenderStepped:Connect(function()
+	if flying and bv and bg then
+		local cam = workspace.CurrentCamera
+		local dir =
+			(cam.CFrame.LookVector * (move.f - move.b)) +
+			(cam.CFrame.RightVector * (move.r - move.l)) +
+			(Vector3.new(0,1,0) * (move.u - move.d))
 
-for i, mob in pairs(mobsSea1) do
-    local btn = Instance.new("TextButton")
-    btn.Text = "🎯 " .. mob
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.Position = UDim2.new(0.05, 0, yPos, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		bv.Velocity = dir * speed
+		bg.CFrame = cam.CFrame
+	end
+end)
+
+print("✈️ Fly Script Loaded")    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Parent = mainFrame
     
     btn.MouseButton1Click:Connect(function()
