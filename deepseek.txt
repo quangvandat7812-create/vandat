@@ -1,79 +1,278 @@
--- ✈️ Fly Script (Safe)
--- For your own Roblox game
+-- 🍌 BANANA HUB | FULL ALL DEMO (SAFE)
+-- UI + Logo + Auto Attack + Auto Farm + Aim + Aim FOV + ESP
+-- Chỉ dùng cho game của bạn
 
+-------------------------
+-- SERVICES
+-------------------------
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
-local humanoid = char:WaitForChild("Humanoid")
 
-local flying = false
-local speed = 60
+-------------------------
+-- STATES
+-------------------------
+_G.AutoAttack = false
+_G.AutoFarm   = false
+_G.Aim        = false
+_G.AimFOV     = false
+_G.ESP        = false
 
-local bv, bg
-local move = {f=0,b=0,l=0,r=0,u=0,d=0}
+-------------------------
+-- CONFIG
+-------------------------
+local RANGE       = 20
+local AIM_PART    = "Head"
+local SMOOTH      = 0.15
+local FARM_OFFSET = CFrame.new(0,0,-3)
 
--- Bắt phím
-UIS.InputBegan:Connect(function(input,gp)
-	if gp then return end
-	if input.KeyCode == Enum.KeyCode.F then
-		flying = not flying
+-------------------------
+-- GUI
+-------------------------
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.Name = "BananaHub"
 
-		if flying then
-			humanoid.PlatformStand = true
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromScale(0.45,0.55)
+main.Position = UDim2.fromScale(0.275,0.2)
+main.BackgroundColor3 = Color3.fromRGB(18,18,18)
+main.Active = true
+main.Draggable = true
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,18)
 
-			bv = Instance.new("BodyVelocity", hrp)
-			bv.MaxForce = Vector3.new(1e9,1e9,1e9)
+-- LOGO
+local logo = Instance.new("ImageLabel", main)
+logo.Size = UDim2.fromScale(0.16,0.16)
+logo.Position = UDim2.fromScale(0.02,0.02)
+logo.BackgroundTransparency = 1
+logo.Image = "rbxassetid://83592774650890" -- 🔴 đổi ID logo của bạn
+Instance.new("UICorner", logo).CornerRadius = UDim.new(1,0)
 
-			bg = Instance.new("BodyGyro", hrp)
-			bg.MaxTorque = Vector3.new(1e9,1e9,1e9)
-			bg.P = 9e4
-		else
-			humanoid.PlatformStand = false
-			if bv then bv:Destroy() end
-			if bg then bg:Destroy() end
+-- TITLE
+local title = Instance.new("TextLabel", main)
+title.Position = UDim2.fromScale(0.22,0)
+title.Size = UDim2.fromScale(0.78,0.12)
+title.BackgroundTransparency = 1
+title.Text = "🍌 Banana Hub | FULL DEMO"
+title.TextScaled = true
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255,225,0)
+
+-------------------------
+-- TAB BAR
+-------------------------
+local tabBar = Instance.new("Frame", main)
+tabBar.Position = UDim2.fromScale(0,0.12)
+tabBar.Size = UDim2.fromScale(1,0.12)
+tabBar.BackgroundTransparency = 1
+
+local function tabBtn(text,x)
+	local b = Instance.new("TextButton", tabBar)
+	b.Size = UDim2.fromScale(0.3,0.9)
+	b.Position = UDim2.fromScale(x,0.05)
+	b.Text = text
+	b.TextScaled = true
+	b.Font = Enum.Font.GothamBold
+	b.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	b.TextColor3 = Color3.new(1,1,1)
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0,12)
+	return b
+end
+
+local combatTab = tabBtn("⚔ Combat",0.03)
+local farmTab   = tabBtn("🌾 Farm",0.35)
+local espTab    = tabBtn("👁 ESP",0.67)
+
+-------------------------
+-- PAGES
+-------------------------
+local function page()
+	local f = Instance.new("Frame", main)
+	f.Position = UDim2.fromScale(0,0.24)
+	f.Size = UDim2.fromScale(1,0.76)
+	f.BackgroundTransparency = 1
+	f.Visible = false
+	return f
+end
+
+local combatPage = page()
+local farmPage   = page()
+local espPage    = page()
+combatPage.Visible = true
+
+-------------------------
+-- TOGGLE BUTTON
+-------------------------
+local function toggle(parent,text,y,cb)
+	local b = Instance.new("TextButton", parent)
+	b.Size = UDim2.fromScale(0.8,0.18)
+	b.Position = UDim2.fromScale(0.1,y)
+	b.Text = text.." : OFF"
+	b.TextScaled = true
+	b.Font = Enum.Font.GothamBold
+	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	b.TextColor3 = Color3.new(1,1,1)
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0,14)
+
+	local on = false
+	b.MouseButton1Click:Connect(function()
+		on = not on
+		b.Text = text.." : "..(on and "ON" or "OFF")
+		cb(on)
+	end)
+end
+
+-- COMBAT
+toggle(combatPage,"Auto Attack",0.1,function(v) _G.AutoAttack=v end)
+toggle(combatPage,"Aim Assist",0.35,function(v) _G.Aim=v end)
+toggle(combatPage,"Aim FOV Circle",0.6,function(v) _G.AimFOV=v end)
+
+-- FARM
+toggle(farmPage,"Auto Farm",0.1,function(v) _G.AutoFarm=v end)
+
+-- ESP
+toggle(espPage,"ESP",0.1,function(v) _G.ESP=v end)
+
+-------------------------
+-- TAB SWITCH
+-------------------------
+local function show(p)
+	combatPage.Visible=false
+	farmPage.Visible=false
+	espPage.Visible=false
+	p.Visible=true
+end
+combatTab.MouseButton1Click:Connect(function() show(combatPage) end)
+farmTab.MouseButton1Click:Connect(function() show(farmPage) end)
+espTab.MouseButton1Click:Connect(function() show(espPage) end)
+
+-------------------------
+-- AIM FOV CIRCLE
+-------------------------
+local FOV_RADIUS = 120
+local circle = Drawing.new("Circle")
+circle.Radius = FOV_RADIUS
+circle.Color = Color3.fromRGB(255,255,0)
+circle.Thickness = 2
+circle.Filled = false
+circle.Visible = false
+
+RunService.RenderStepped:Connect(function()
+	circle.Position = Vector2.new(
+		camera.ViewportSize.X/2,
+		camera.ViewportSize.Y/2
+	)
+	circle.Visible = _G.AimFOV
+end)
+
+-------------------------
+-- TARGET (NORMAL)
+-------------------------
+local function getTarget()
+	local nearest,dist=nil,math.huge
+	for _,v in pairs(workspace:GetChildren()) do
+		if v:IsA("Model") and v~=char
+			and v:FindFirstChild("Humanoid")
+			and v:FindFirstChild("HumanoidRootPart")
+			and v.Humanoid.Health>0 then
+			local d=(hrp.Position-v.HumanoidRootPart.Position).Magnitude
+			if d<dist and d<=RANGE then
+				dist=d
+				nearest=v
+			end
 		end
 	end
+	return nearest
+end
 
-	if input.KeyCode == Enum.KeyCode.W then move.f=1 end
-	if input.KeyCode == Enum.KeyCode.S then move.b=1 end
-	if input.KeyCode == Enum.KeyCode.A then move.l=1 end
-	if input.KeyCode == Enum.KeyCode.D then move.r=1 end
-	if input.KeyCode == Enum.KeyCode.Space then move.u=1 end
-	if input.KeyCode == Enum.KeyCode.LeftControl then move.d=1 end
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.W then move.f=0 end
-	if input.KeyCode == Enum.KeyCode.S then move.b=0 end
-	if input.KeyCode == Enum.KeyCode.A then move.l=0 end
-	if input.KeyCode == Enum.KeyCode.D then move.r=0 end
-	if input.KeyCode == Enum.KeyCode.Space then move.u=0 end
-	if input.KeyCode == Enum.KeyCode.LeftControl then move.d=0 end
-end)
-
--- Bay
-RunService.RenderStepped:Connect(function()
-	if flying and bv and bg then
-		local cam = workspace.CurrentCamera
-		local dir =
-			(cam.CFrame.LookVector * (move.f - move.b)) +
-			(cam.CFrame.RightVector * (move.r - move.l)) +
-			(Vector3.new(0,1,0) * (move.u - move.d))
-
-		bv.Velocity = dir * speed
-		bg.CFrame = cam.CFrame
+-------------------------
+-- TARGET (FOV)
+-------------------------
+local function getTargetInFOV()
+	local nearest,dist=nil,math.huge
+	local center = Vector2.new(
+		camera.ViewportSize.X/2,
+		camera.ViewportSize.Y/2
+	)
+	for _,v in pairs(workspace:GetChildren()) do
+		if v:IsA("Model") and v~=char
+			and v:FindFirstChild("Humanoid")
+			and v:FindFirstChild(AIM_PART)
+			and v.Humanoid.Health>0 then
+			local pos,ok=camera:WorldToViewportPoint(v[AIM_PART].Position)
+			if ok then
+				local m=(Vector2.new(pos.X,pos.Y)-center).Magnitude
+				if m<FOV_RADIUS and m<dist then
+					dist=m
+					nearest=v
+				end
+			end
+		end
 	end
-end)
+	return nearest
+end
 
-print("✈️ Fly Script Loaded")    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Parent = mainFrame
-    
-    btn.MouseButton1Click:Connect(function()
-        Settings.SelectedMob = mob
+-------------------------
+-- ESP SIMPLE
+-------------------------
+local ESPs={}
+local function createESP(m)
+	if ESPs[m] then return end
+	local bb=Instance.new("BillboardGui",m)
+	bb.Size=UDim2.new(0,200,0,40)
+	bb.AlwaysOnTop=true
+	bb.Adornee=m.HumanoidRootPart
+	local t=Instance.new("TextLabel",bb)
+	t.Size=UDim2.new(1,0,1,0)
+	t.BackgroundTransparency=1
+	t.TextScaled=true
+	t.Font=Enum.Font.GothamBold
+	t.TextColor3=Color3.fromRGB(255,80,80)
+	t.Text=m.Name
+	ESPs[m]=bb
+end
+local function removeESP(m)
+	if ESPs[m] then ESPs[m]:Destroy() ESPs[m]=nil end
+end
+
+-------------------------
+-- MAIN LOOP
+-------------------------
+RunService.RenderStepped:Connect(function()
+	local target = _G.AimFOV and getTargetInFOV() or getTarget()
+
+	if _G.AutoFarm and target then
+		hrp.CFrame = target.HumanoidRootPart.CFrame * FARM_OFFSET
+	end
+
+	if _G.AutoAttack and target then
+		local tool = char:FindFirstChildOfClass("Tool")
+		if tool then tool:Activate() end
+	end
+
+	if _G.Aim and target and target:FindFirstChild(AIM_PART) then
+		local cf=camera.CFrame
+		camera.CFrame = cf:Lerp(
+			CFrame.new(cf.Position,target[AIM_PART].Position),
+			SMOOTH
+		)
+	end
+
+	for _,v in pairs(workspace:GetChildren()) do
+		if v:IsA("Model") and v~=char
+			and v:FindFirstChild("Humanoid")
+			and v:FindFirstChild("HumanoidRootPart")
+			and v.Humanoid.Health>0 then
+			if _G.ESP then createESP(v) else removeESP(v) end
+		end
+	end
+end)        Settings.SelectedMob = mob
         farmToggle.Text = "🔰 Auto Farm: " .. mob
     end)
     
