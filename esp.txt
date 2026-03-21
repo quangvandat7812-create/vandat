@@ -3,54 +3,25 @@ local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 
-local ENABLED = false
-local FOLLOW = false
-local target = nil
-
--- ===== GUI =====
-local gui = Instance.new("ScreenGui", game.CoreGui)
-
-local btn = Instance.new("TextButton", gui)
-btn.Size = UDim2.new(0,140,0,40)
-btn.Position = UDim2.new(0,20,0,100)
-btn.Text = "ASSIST OFF"
-btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
-
-local followBtn = Instance.new("TextButton", gui)
-followBtn.Size = UDim2.new(0,140,0,40)
-followBtn.Position = UDim2.new(0,20,0,150)
-followBtn.Text = "FOLLOW OFF"
-followBtn.BackgroundColor3 = Color3.fromRGB(170,0,0)
-
-btn.MouseButton1Click:Connect(function()
-    ENABLED = not ENABLED
-    btn.Text = ENABLED and "ASSIST ON" or "ASSIST OFF"
-    btn.BackgroundColor3 = ENABLED and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
-end)
-
-followBtn.MouseButton1Click:Connect(function()
-    FOLLOW = not FOLLOW
-    followBtn.Text = FOLLOW and "FOLLOW ON" or "FOLLOW OFF"
-    followBtn.BackgroundColor3 = FOLLOW and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
-end)
-
 -- ===== CROSSHAIR =====
 local crosshair = Drawing.new("Circle")
 crosshair.Radius = 5
 crosshair.Thickness = 2
 crosshair.Filled = false
+crosshair.Visible = true
 
 -- ===== FOV =====
 local fov = Drawing.new("Circle")
 fov.Radius = 120
 fov.Thickness = 1
 fov.Filled = false
+fov.Visible = true
 
 -- ===== LINE =====
 local line = Drawing.new("Line")
 line.Thickness = 2
 
--- ===== FIND TARGET GẦN TÂM =====
+-- ===== FIND TARGET =====
 function getClosest()
     local closest = nil
     local shortest = math.huge
@@ -78,20 +49,11 @@ RunService.RenderStepped:Connect(function()
     crosshair.Position = center
     fov.Position = center
 
-    if not ENABLED then
-        crosshair.Visible = false
-        fov.Visible = false
-        line.Visible = false
-        return
-    end
-
-    crosshair.Visible = true
-    fov.Visible = true
-
-    target = getClosest()
+    local target = getClosest()
 
     if target and target.Character then
         crosshair.Color = Color3.fromRGB(0,255,0)
+        fov.Color = Color3.fromRGB(0,255,150)
 
         local hrp = target.Character:FindFirstChild("HumanoidRootPart")
         local my = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -106,16 +68,9 @@ RunService.RenderStepped:Connect(function()
             line.Color = Color3.fromRGB(0,255,150)
         end
 
-        -- FOLLOW
-        if FOLLOW then
-            local hum = target.Character:FindFirstChild("Humanoid")
-            if hum then
-                Camera.CameraSubject = hum
-            end
-        end
-
     else
         crosshair.Color = Color3.fromRGB(255,255,255)
+        fov.Color = Color3.fromRGB(255,255,255)
         line.Visible = false
     end
 end)
