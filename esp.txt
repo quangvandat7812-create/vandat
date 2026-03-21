@@ -1,0 +1,139 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
+
+local ESP_ON = false
+
+-- ===== GUI =====
+local gui = Instance.new("ScreenGui", game.CoreGui)
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 180, 0, 120)
+frame.Position = UDim2.new(0.05, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+-- bo góc
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
+
+-- title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,30)
+title.Text = "ESP MENU"
+title.BackgroundColor3 = Color3.fromRGB(20,20,20)
+title.TextColor3 = Color3.new(1,1,1)
+title.Parent = frame
+
+local corner2 = Instance.new("UICorner", title)
+corner2.CornerRadius = UDim.new(0, 10)
+
+-- button ESP
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(0.8,0,0,40)
+btn.Position = UDim2.new(0.1,0,0.5,0)
+btn.Text = "ESP OFF"
+btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
+btn.TextColor3 = Color3.new(1,1,1)
+btn.Parent = frame
+
+local corner3 = Instance.new("UICorner", btn)
+corner3.CornerRadius = UDim.new(0, 8)
+
+-- toggle
+btn.MouseButton1Click:Connect(function()
+    ESP_ON = not ESP_ON
+    
+    if ESP_ON then
+        btn.Text = "ESP ON"
+        btn.BackgroundColor3 = Color3.fromRGB(0,170,0)
+    else
+        btn.Text = "ESP OFF"
+        btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
+    end
+end)
+
+-- ===== DRAG UI =====
+local dragging, dragInput, dragStart, startPos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- ===== ESP =====
+function addESP(player)
+    if player == LocalPlayer then return end
+    
+    player.CharacterAdded:Connect(function(char)
+        repeat wait() until char:FindFirstChild("HumanoidRootPart")
+
+        local hl = Instance.new("Highlight")
+        hl.Parent = char
+        hl.FillColor = Color3.fromRGB(255, 0, 0)
+        hl.FillTransparency = 0.5
+
+        local bill = Instance.new("BillboardGui")
+        bill.Size = UDim2.new(0,200,0,50)
+        bill.StudsOffset = Vector3.new(0,3,0)
+        bill.AlwaysOnTop = true
+        bill.Parent = char:WaitForChild("Head")
+
+        local text = Instance.new("TextLabel")
+        text.Size = UDim2.new(1,0,1,0)
+        text.BackgroundTransparency = 1
+        text.TextColor3 = Color3.new(1,1,1)
+        text.TextStrokeTransparency = 0
+        text.TextScaled = true
+        text.Parent = bill
+
+        while char and char.Parent do
+            wait(0.1)
+
+            hl.Enabled = ESP_ON
+            bill.Enabled = ESP_ON
+
+            if ESP_ON then
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                local humanoid = char:FindFirstChild("Humanoid")
+
+                if hrp and humanoid and LocalPlayer.Character then
+                    local dist = math.floor((hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)
+
+                    text.Text = player.Name ..
+                        "\nHP: " .. math.floor(humanoid.Health) ..
+                        "\nDist: " .. dist
+                end
+            end
+        end
+    end)
+end
+
+-- apply
+for _, p in pairs(Players:GetPlayers()) do
+    addESP(p)
+end
+
+Players.PlayerAdded:Connect(addESP)
