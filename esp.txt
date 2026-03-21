@@ -1,61 +1,68 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local ESP_ON = false
 
--- ===== GUI =====
+-- ===== INTRO =====
+local introGui = Instance.new("ScreenGui", game.CoreGui)
+
+local introText = Instance.new("TextLabel", introGui)
+introText.Size = UDim2.new(1,0,1,0)
+introText.BackgroundTransparency = 1
+introText.Text = "by: vandatdz"
+introText.TextColor3 = Color3.fromRGB(0,255,150)
+introText.TextScaled = true
+introText.TextTransparency = 1
+
+-- fade in
+TweenService:Create(introText, TweenInfo.new(1), {TextTransparency = 0}):Play()
+task.wait(2)
+
+-- fade out
+TweenService:Create(introText, TweenInfo.new(1), {TextTransparency = 1}):Play()
+task.wait(1)
+
+introGui:Destroy()
+
+-- ===== MENU =====
 local gui = Instance.new("ScreenGui", game.CoreGui)
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 180, 0, 120)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 200, 0, 120)
 frame.Position = UDim2.new(0.05, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-frame.BorderSizePixel = 0
-frame.Parent = gui
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", frame)
 
--- bo góc
-local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 10)
-
--- title
-local title = Instance.new("TextLabel")
+local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,30)
 title.Text = "ESP MENU"
-title.BackgroundColor3 = Color3.fromRGB(20,20,20)
+title.BackgroundColor3 = Color3.fromRGB(15,15,15)
 title.TextColor3 = Color3.new(1,1,1)
-title.Parent = frame
 
-local corner2 = Instance.new("UICorner", title)
-corner2.CornerRadius = UDim.new(0, 10)
+local credit = Instance.new("TextLabel", frame)
+credit.Size = UDim2.new(1,0,0,20)
+credit.Position = UDim2.new(0,0,0.25,0)
+credit.Text = "by: vandatdz"
+credit.BackgroundTransparency = 1
+credit.TextColor3 = Color3.fromRGB(0,255,150)
 
--- button ESP
-local btn = Instance.new("TextButton")
+local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0.8,0,0,40)
-btn.Position = UDim2.new(0.1,0,0.5,0)
+btn.Position = UDim2.new(0.1,0,0.55,0)
 btn.Text = "ESP OFF"
 btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
-btn.TextColor3 = Color3.new(1,1,1)
-btn.Parent = frame
+Instance.new("UICorner", btn)
 
-local corner3 = Instance.new("UICorner", btn)
-corner3.CornerRadius = UDim.new(0, 8)
-
--- toggle
 btn.MouseButton1Click:Connect(function()
     ESP_ON = not ESP_ON
-    
-    if ESP_ON then
-        btn.Text = "ESP ON"
-        btn.BackgroundColor3 = Color3.fromRGB(0,170,0)
-    else
-        btn.Text = "ESP OFF"
-        btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
-    end
+    btn.Text = ESP_ON and "ESP ON" or "ESP OFF"
+    btn.BackgroundColor3 = ESP_ON and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
 end)
 
--- ===== DRAG UI =====
-local dragging, dragInput, dragStart, startPos
+-- ===== DRAG =====
+local dragging, dragStart, startPos
 
 frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -86,52 +93,47 @@ end)
 -- ===== ESP =====
 function addESP(player)
     if player == LocalPlayer then return end
-    
-    player.CharacterAdded:Connect(function(char)
-        repeat wait() until char:FindFirstChild("HumanoidRootPart")
 
-        local hl = Instance.new("Highlight")
-        hl.Parent = char
-        hl.FillColor = Color3.fromRGB(255, 0, 0)
-        hl.FillTransparency = 0.5
+    player.CharacterAdded:Connect(function(char)
+        local hrp = char:WaitForChild("HumanoidRootPart", 5)
+        local head = char:WaitForChild("Head", 5)
+        local humanoid = char:WaitForChild("Humanoid", 5)
+
+        if not hrp then return end
+
+        local hl = Instance.new("Highlight", char)
 
         local bill = Instance.new("BillboardGui")
-        bill.Size = UDim2.new(0,200,0,50)
+        bill.Size = UDim2.new(0,200,0,60)
         bill.StudsOffset = Vector3.new(0,3,0)
         bill.AlwaysOnTop = true
-        bill.Parent = char:WaitForChild("Head")
+        bill.Parent = head
 
-        local text = Instance.new("TextLabel")
+        local text = Instance.new("TextLabel", bill)
         text.Size = UDim2.new(1,0,1,0)
         text.BackgroundTransparency = 1
         text.TextColor3 = Color3.new(1,1,1)
         text.TextStrokeTransparency = 0
         text.TextScaled = true
-        text.Parent = bill
 
-        while char and char.Parent do
-            wait(0.1)
+        while char.Parent do
+            task.wait(0.1)
 
             hl.Enabled = ESP_ON
             bill.Enabled = ESP_ON
 
-            if ESP_ON then
-                local hrp = char:FindFirstChild("HumanoidRootPart")
-                local humanoid = char:FindFirstChild("Humanoid")
+            if ESP_ON and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local dist = math.floor((hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)
 
-                if hrp and humanoid and LocalPlayer.Character then
-                    local dist = math.floor((hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)
-
-                    text.Text = player.Name ..
-                        "\nHP: " .. math.floor(humanoid.Health) ..
-                        "\nDist: " .. dist
-                end
+                text.Text = player.Name ..
+                    "\nHP: " .. math.floor(humanoid.Health) ..
+                    "\nDist: " .. dist ..
+                    "\nby:vandatdz"
             end
         end
     end)
 end
 
--- apply
 for _, p in pairs(Players:GetPlayers()) do
     addESP(p)
 end
