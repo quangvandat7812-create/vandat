@@ -1,162 +1,121 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
 
-local ESP_ON = false
+local ENABLED = false
+local FOLLOW = false
+local target = nil
 
 -- ===== GUI =====
 local gui = Instance.new("ScreenGui", game.CoreGui)
 
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 220, 0, 170)
-frame.Position = UDim2.new(0.05, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
-Instance.new("UICorner", frame)
-
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1,0,0,30)
-title.Text = "MAX VIP ESP"
-title.BackgroundColor3 = Color3.fromRGB(10,10,10)
-title.TextColor3 = Color3.new(1,1,1)
-
-local credit = Instance.new("TextLabel", frame)
-credit.Size = UDim2.new(1,0,0,20)
-credit.Position = UDim2.new(0,0,0.2,0)
-credit.Text = "by: vandatdz"
-credit.BackgroundTransparency = 1
-credit.TextColor3 = Color3.fromRGB(0,255,150)
-
-local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.8,0,0,40)
-btn.Position = UDim2.new(0.1,0,0.5,0)
-btn.Text = "ESP OFF"
+local btn = Instance.new("TextButton", gui)
+btn.Size = UDim2.new(0,140,0,40)
+btn.Position = UDim2.new(0,20,0,100)
+btn.Text = "ASSIST OFF"
 btn.BackgroundColor3 = Color3.fromRGB(170,0,0)
-Instance.new("UICorner", btn)
+
+local followBtn = Instance.new("TextButton", gui)
+followBtn.Size = UDim2.new(0,140,0,40)
+followBtn.Position = UDim2.new(0,20,0,150)
+followBtn.Text = "FOLLOW OFF"
+followBtn.BackgroundColor3 = Color3.fromRGB(170,0,0)
 
 btn.MouseButton1Click:Connect(function()
-    ESP_ON = not ESP_ON
-    btn.Text = ESP_ON and "ESP ON" or "ESP OFF"
-    btn.BackgroundColor3 = ESP_ON and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
+    ENABLED = not ENABLED
+    btn.Text = ENABLED and "ASSIST ON" or "ASSIST OFF"
+    btn.BackgroundColor3 = ENABLED and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
 end)
 
--- ===== DRAG =====
-local dragging, dragStart, startPos
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
+followBtn.MouseButton1Click:Connect(function()
+    FOLLOW = not FOLLOW
+    followBtn.Text = FOLLOW and "FOLLOW ON" or "FOLLOW OFF"
+    followBtn.BackgroundColor3 = FOLLOW and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
 end)
 
-frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
+-- ===== CROSSHAIR =====
+local crosshair = Drawing.new("Circle")
+crosshair.Radius = 5
+crosshair.Thickness = 2
+crosshair.Filled = false
 
-UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
+-- ===== FOV =====
+local fov = Drawing.new("Circle")
+fov.Radius = 120
+fov.Thickness = 1
+fov.Filled = false
 
--- ===== RAINBOW =====
-local hue = 0
-RunService.RenderStepped:Connect(function()
-    hue = (hue + 0.005) % 1
-end)
+-- ===== LINE =====
+local line = Drawing.new("Line")
+line.Thickness = 2
 
--- ===== ESP =====
-function addESP(player)
-    if player == LocalPlayer then return end
+-- ===== FIND TARGET GẦN TÂM =====
+function getClosest()
+    local closest = nil
+    local shortest = math.huge
 
-    local function onChar(char)
-        local hrp = char:WaitForChild("HumanoidRootPart", 5)
-        local head = char:WaitForChild("Head", 5)
-        local humanoid = char:WaitForChild("Humanoid", 5)
-
-        if not hrp or not head or not humanoid then return end
-
-        local hl = Instance.new("Highlight", char)
-
-        local box = Instance.new("BoxHandleAdornment")
-        box.Size = Vector3.new(4,6,2)
-        box.AlwaysOnTop = true
-        box.Adornee = char
-        box.Parent = char
-
-        local bill = Instance.new("BillboardGui")
-        bill.Size = UDim2.new(0,200,0,60)
-        bill.StudsOffset = Vector3.new(0,3,0)
-        bill.AlwaysOnTop = true
-        bill.Parent = head
-
-        local text = Instance.new("TextLabel", bill)
-        text.Size = UDim2.new(1,0,1,0)
-        text.BackgroundTransparency = 1
-        text.TextColor3 = Color3.new(1,1,1)
-        text.TextStrokeTransparency = 0
-        text.TextScaled = true
-
-        -- Head dot
-        local dot = Instance.new("Part")
-        dot.Shape = Enum.PartType.Ball
-        dot.Size = Vector3.new(0.5,0.5,0.5)
-        dot.Anchored = true
-        dot.CanCollide = false
-        dot.Parent = workspace
-
-        while char.Parent do
-            task.wait()
-
-            if player.Team == LocalPlayer.Team then
-                hl.Enabled = false
-                box.Visible = false
-                bill.Enabled = false
-                dot.Transparency = 1
-                continue
-            end
-
-            hl.Enabled = ESP_ON
-            box.Visible = ESP_ON
-            bill.Enabled = ESP_ON
-            dot.Transparency = ESP_ON and 0 or 1
-
-            if ESP_ON and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                local dist = math.floor((hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)
-                local color = Color3.fromHSV(hue,1,1)
-
-                hl.FillColor = color
-                box.Color3 = color
-                dot.Color = color
-                dot.Position = head.Position
-
-                text.Text = player.Name ..
-                    "\nHP: " .. math.floor(humanoid.Health) ..
-                    "\nDist: " .. dist ..
-                    "\nby:vandatdz"
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local pos, visible = Camera:WorldToViewportPoint(p.Character.HumanoidRootPart.Position)
+            if visible then
+                local dist = (Vector2.new(pos.X, pos.Y) - (Camera.ViewportSize/2)).Magnitude
+                if dist < shortest and dist < fov.Radius then
+                    shortest = dist
+                    closest = p
+                end
             end
         end
     end
 
-    if player.Character then
-        task.spawn(onChar, player.Character)
+    return closest
+end
+
+-- ===== LOOP =====
+RunService.RenderStepped:Connect(function()
+    local center = Camera.ViewportSize / 2
+
+    crosshair.Position = center
+    fov.Position = center
+
+    if not ENABLED then
+        crosshair.Visible = false
+        fov.Visible = false
+        line.Visible = false
+        return
     end
 
-    player.CharacterAdded:Connect(onChar)
-end
+    crosshair.Visible = true
+    fov.Visible = true
 
-for _, p in pairs(Players:GetPlayers()) do
-    addESP(p)
-end
+    target = getClosest()
 
-Players.PlayerAdded:Connect(addESP)
+    if target and target.Character then
+        crosshair.Color = Color3.fromRGB(0,255,0)
+
+        local hrp = target.Character:FindFirstChild("HumanoidRootPart")
+        local my = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if hrp and my then
+            local p1 = Camera:WorldToViewportPoint(my.Position)
+            local p2 = Camera:WorldToViewportPoint(hrp.Position)
+
+            line.Visible = true
+            line.From = Vector2.new(p1.X, p1.Y)
+            line.To = Vector2.new(p2.X, p2.Y)
+            line.Color = Color3.fromRGB(0,255,150)
+        end
+
+        -- FOLLOW
+        if FOLLOW then
+            local hum = target.Character:FindFirstChild("Humanoid")
+            if hum then
+                Camera.CameraSubject = hum
+            end
+        end
+
+    else
+        crosshair.Color = Color3.fromRGB(255,255,255)
+        line.Visible = false
+    end
+end)
