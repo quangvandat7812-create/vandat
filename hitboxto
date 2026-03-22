@@ -1,4 +1,4 @@
---// VANDATDZ ESP FULL VIP ULTIMATE (FIX AUTO KEY + UI)
+--// VANDATDZ ESP FULL VIP ULTIMATE (FINAL FIX ALL)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -34,6 +34,19 @@ local function loadKey()
     end
 end
 
+--================ TEXT FIX =================--
+
+local function fixText(obj)
+    if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+        obj.TextColor3 = Color3.fromRGB(255,255,255)
+        obj.TextStrokeTransparency = 0
+        obj.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+        obj.Font = Enum.Font.GothamBold
+        obj.TextSize = 16
+        obj.TextTransparency = 0
+    end
+end
+
 --================ LOGIN =================--
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
@@ -47,22 +60,13 @@ Instance.new("UICorner", frame)
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
 title.Text = "Login Menu VanDatdz"
-title.TextColor3 = Color3.fromRGB(0,255,255)
-title.TextStrokeTransparency = 0
-title.TextStrokeColor3 = Color3.fromRGB(0,0,0)
 title.BackgroundTransparency = 1
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
 
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0.8,0,0,35)
 box.Position = UDim2.new(0.1,0,0.4,0)
 box.PlaceholderText = "Enter key..."
 box.BackgroundColor3 = Color3.fromRGB(35,35,35)
-box.TextColor3 = Color3.fromRGB(255,255,255)
-box.TextStrokeTransparency = 0.8
-box.Font = Enum.Font.Gotham
-box.TextSize = 14
 Instance.new("UICorner", box)
 
 local btn = Instance.new("TextButton", frame)
@@ -70,10 +74,6 @@ btn.Size = UDim2.new(0.4,0,0,30)
 btn.Position = UDim2.new(0.1,0,0.75,0)
 btn.Text = "LOGIN"
 btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-btn.TextColor3 = Color3.fromRGB(255,255,255)
-btn.TextStrokeTransparency = 0
-btn.Font = Enum.Font.GothamBold
-btn.TextSize = 15
 Instance.new("UICorner", btn)
 
 local linkBtn = Instance.new("TextButton", frame)
@@ -81,11 +81,13 @@ linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
 linkBtn.Text = "GET KEY"
 linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
-linkBtn.TextColor3 = Color3.fromRGB(255,255,255)
-linkBtn.TextStrokeTransparency = 0
-linkBtn.Font = Enum.Font.GothamBold
-btn.TextSize = 15
 Instance.new("UICorner", linkBtn)
+
+-- APPLY TEXT FIX
+fixText(title)
+fixText(box)
+fixText(btn)
+fixText(linkBtn)
 
 linkBtn.MouseButton1Click:Connect(function()
     if setclipboard then
@@ -110,12 +112,8 @@ local function createMenu()
     local title = Instance.new("TextLabel", main)
     title.Size = UDim2.new(1,0,0,35)
     title.Text = "Menu Vandatdz Esp"
-    title.TextColor3 = Color3.fromRGB(0,255,255)
-    title.TextStrokeTransparency = 0
-    title.TextStrokeColor3 = Color3.fromRGB(0,0,0)
     title.BackgroundTransparency = 1
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 18
+    fixText(title)
 
     local function toggle(name,y,state,callback)
         local b = Instance.new("TextButton", main)
@@ -124,11 +122,7 @@ local function createMenu()
         b.Text = name..": "..(state and "ON" or "OFF")
         b.BackgroundColor3 = Color3.fromRGB(35,35,35)
 
-        b.TextColor3 = Color3.fromRGB(255,255,255)
-        b.TextStrokeTransparency = 0
-        b.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-        b.Font = Enum.Font.GothamBold
-        b.TextSize = 15
+        fixText(b)
 
         Instance.new("UICorner", b)
 
@@ -178,10 +172,96 @@ local function createMenu()
     end)
 end
 
+--================ ESP + SKELETON =================--
+
+local function esp(p)
+    if p==LocalPlayer then return end
+
+    local line=Drawing.new("Line")
+    local text=Drawing.new("Text")
+
+    -- TEXT FIX ESP
+    text.Size = 16
+    text.Center = true
+    text.Outline = true
+    text.Color = Color3.fromRGB(255,255,255)
+    text.Font = 2
+
+    local function newLine()
+        local l = Drawing.new("Line")
+        l.Thickness = 2
+        l.Color = Color3.fromRGB(0,255,255)
+        return l
+    end
+
+    local bones = {
+        newLine(), newLine(), newLine(), newLine(), newLine()
+    }
+
+    RunService.RenderStepped:Connect(function()
+        if not p.Parent then
+            line:Remove() text:Remove()
+            for _,b in pairs(bones) do b:Remove() end
+            return
+        end
+
+        local c=p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            local pos,vis=Camera:WorldToViewportPoint(c.HumanoidRootPart.Position)
+
+            if ESP and vis then
+                text.Text="@"..p.Name
+                text.Position=Vector2.new(pos.X,pos.Y-30)
+                text.Visible=true
+                text.Transparency = 1
+
+                if LINE then
+                    line.From=Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+                    line.To=Vector2.new(pos.X,pos.Y)
+                    line.Visible=true
+                else line.Visible=false end
+            else
+                text.Visible=false line.Visible=false
+            end
+
+            if SKELETON then
+                local function gp(part)
+                    local p2=Camera:WorldToViewportPoint(part.Position)
+                    return Vector2.new(p2.X,p2.Y)
+                end
+
+                local head=c:FindFirstChild("Head")
+                local root=c:FindFirstChild("HumanoidRootPart")
+                local la=c:FindFirstChild("LeftHand") or c:FindFirstChild("Left Arm")
+                local ra=c:FindFirstChild("RightHand") or c:FindFirstChild("Right Arm")
+                local ll=c:FindFirstChild("LeftFoot") or c:FindFirstChild("Left Leg")
+                local rl=c:FindFirstChild("RightFoot") or c:FindFirstChild("Right Leg")
+
+                if head and root then
+                    local h=gp(head)
+                    local r=gp(root)
+
+                    bones[1].From=h bones[1].To=r bones[1].Visible=true
+                    if la then bones[2].From=r bones[2].To=gp(la) bones[2].Visible=true end
+                    if ra then bones[3].From=r bones[3].To=gp(ra) bones[3].Visible=true end
+                    if ll then bones[4].From=r bones[4].To=gp(ll) bones[4].Visible=true end
+                    if rl then bones[5].From=r bones[5].To=gp(rl) bones[5].Visible=true end
+                end
+            else
+                for _,b in pairs(bones) do b.Visible=false end
+            end
+        end
+    end)
+end
+
 --================ START =================--
 
 local function start()
     createMenu()
+    for _,v in pairs(Players:GetPlayers()) do
+        esp(v)
+    end
+    Players.PlayerAdded:Connect(esp)
 end
 
 --================ AUTO KEY =================--
@@ -197,10 +277,8 @@ end
 btn.MouseButton1Click:Connect(function()
     if box.Text == KEY then
         saveKey(KEY)
-
         btn.Text = "SUCCESS!"
         task.wait(0.5)
-
         frame.Visible = false
         start()
     else
