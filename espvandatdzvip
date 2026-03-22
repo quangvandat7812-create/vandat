@@ -1,175 +1,178 @@
---// VANDATDZ MOBILE VIP
+--// VANDATDZ ESP PASSWORD
+
+local PASSWORD = "vandatdz" -- đổi mật khẩu tại đây
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
+
+-- GUI LOGIN
+local gui = Instance.new("ScreenGui", game.CoreGui)
+
+local login = Instance.new("Frame", gui)
+login.Size = UDim2.new(0,250,0,140)
+login.Position = UDim2.new(0.5,-125,0.5,-70)
+login.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", login)
+
+local title = Instance.new("TextLabel", login)
+title.Size = UDim2.new(1,0,0,30)
+title.Text = "Enter Password"
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+
+local box = Instance.new("TextBox", login)
+box.Size = UDim2.new(0.8,0,0,35)
+box.Position = UDim2.new(0.1,0,0.4,0)
+box.PlaceholderText = "password..."
+box.Text = ""
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", login)
+btn.Size = UDim2.new(0.5,0,0,30)
+btn.Position = UDim2.new(0.25,0,0.75,0)
+btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
 
 -- SETTINGS
 local ESP = true
 local LINE = true
-local AIM = false
-local SILENT = false
-local FOV = 120
-local SMOOTH = 0.2
 
--- FOV
-local circle = Drawing.new("Circle")
-circle.Color = Color3.fromRGB(0,255,0)
-circle.Radius = FOV
-circle.Thickness = 1
-circle.Filled = false
+-- MAIN MENU
+local function createMenu()
+    login:Destroy()
 
--- GUI MOBILE
-local gui = Instance.new("ScreenGui", game.CoreGui)
+    local main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0,220,0,170)
+    main.Position = UDim2.new(0,20,0,200)
+    main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Instance.new("UICorner", main)
 
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,220,0,200)
-main.Position = UDim2.new(0,20,0,200)
-main.BackgroundColor3 = Color3.fromRGB(20,20,20)
-Instance.new("UICorner", main)
+    -- Title
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1,0,0,30)
+    title.Text = "Menu VandatdzESP"
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(0,255,255)
+    title.Font = Enum.Font.GothamBold
 
-local function makeBtn(txt,y)
-    local b = Instance.new("TextButton", main)
-    b.Size = UDim2.new(0.8,0,0,35)
-    b.Position = UDim2.new(0.1,0,0,y)
-    b.Text = txt
-    b.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    b.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", b)
-    return b
-end
+    -- Credit
+    local credit = Instance.new("TextLabel", main)
+    credit.Size = UDim2.new(1,0,0,20)
+    credit.Position = UDim2.new(0,0,1,-20)
+    credit.Text = "by:vandatdz"
+    credit.BackgroundTransparency = 1
+    credit.TextColor3 = Color3.fromRGB(150,150,150)
 
-local espB = makeBtn("ESP: ON",20)
-local lineB = makeBtn("LINE: ON",60)
-local aimB = makeBtn("AIM: OFF",100)
-local silentB = makeBtn("SILENT: OFF",140)
+    -- Switch
+    local function switch(name,y,state,callback)
+        local b = Instance.new("TextButton", main)
+        b.Size = UDim2.new(0.8,0,0,35)
+        b.Position = UDim2.new(0.1,0,0,y)
+        b.Text = name..": "..(state and "ON" or "OFF")
+        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+        b.TextColor3 = Color3.new(1,1,1)
+        Instance.new("UICorner", b)
 
-espB.MouseButton1Click:Connect(function()
-    ESP = not ESP
-    espB.Text = "ESP: "..(ESP and "ON" or "OFF")
-end)
-
-lineB.MouseButton1Click:Connect(function()
-    LINE = not LINE
-    lineB.Text = "LINE: "..(LINE and "ON" or "OFF")
-end)
-
-aimB.MouseButton1Click:Connect(function()
-    AIM = not AIM
-    aimB.Text = "AIM: "..(AIM and "ON" or "OFF")
-end)
-
-silentB.MouseButton1Click:Connect(function()
-    SILENT = not SILENT
-    silentB.Text = "SILENT: "..(SILENT and "ON" or "OFF")
-end)
-
--- DRAG MOBILE
-local dragging, dragInput, start, pos
-
-main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        start = input.Position
-        pos = main.Position
+        b.MouseButton1Click:Connect(function()
+            state = not state
+            b.Text = name..": "..(state and "ON" or "OFF")
+            callback(state)
+        end)
     end
-end)
 
-UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.Touch then
-        local delta = input.Position - start
-        main.Position = UDim2.new(pos.X.Scale,pos.X.Offset+delta.X,pos.Y.Scale,pos.Y.Offset+delta.Y)
-    end
-end)
+    switch("ESP",40,ESP,function(v) ESP=v end)
+    switch("LINE",85,LINE,function(v) LINE=v end)
 
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
--- ESP
-local function esp(p)
-    if p == LocalPlayer then return end
-
-    local box = Drawing.new("Square")
-    local line = Drawing.new("Line")
-    local text = Drawing.new("Text")
-
-    text.Size = 13
-    text.Center = true
-    text.Outline = true
-
-    RunService.RenderStepped:Connect(function()
-        local c = p.Character
-        if c and c:FindFirstChild("HumanoidRootPart") and c:FindFirstChild("Humanoid") then
-            local hrp = c.HumanoidRootPart
-            local hum = c.Humanoid
-            local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
-
-            if vis and ESP then
-                local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-                local scale = math.clamp(1/(dist/100),0.5,2)
-
-                box.Size = Vector2.new(50*scale,80*scale)
-                box.Position = Vector2.new(pos.X-(25*scale),pos.Y-(40*scale))
-                box.Color = Color3.fromRGB(255,0,0)
-                box.Visible = true
-
-                text.Position = Vector2.new(pos.X,pos.Y-(50*scale))
-                text.Text = p.Name.." | "..math.floor(hum.Health).."HP | "..math.floor(dist).."m"
-                text.Visible = true
-
-                if LINE then
-                    line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
-                    line.To = Vector2.new(pos.X,pos.Y)
-                    line.Visible = true
-                else
-                    line.Visible = false
-                end
-            else
-                box.Visible = false
-                line.Visible = false
-                text.Visible = false
-            end
+    -- DRAG
+    local drag, start, pos
+    main.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch then
+            drag = true
+            start = i.Position
+            pos = main.Position
         end
     end)
-end
 
-for _,v in pairs(Players:GetPlayers()) do esp(v) end
-Players.PlayerAdded:Connect(esp)
+    UIS.InputChanged:Connect(function(i)
+        if drag and i.UserInputType == Enum.UserInputType.Touch then
+            local delta = i.Position - start
+            main.Position = UDim2.new(pos.X.Scale,pos.X.Offset+delta.X,pos.Y.Scale,pos.Y.Offset+delta.Y)
+        end
+    end)
 
--- AIM + SILENT
-RunService.RenderStepped:Connect(function()
-    circle.Position = UIS:GetMouseLocation()
+    UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch then
+            drag = false
+        end
+    end)
 
-    local closest, dist = nil, FOV
+    -- ESP
+    local function esp(p)
+        if p == LocalPlayer then return end
 
-    for _,v in pairs(Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-            local pos, vis = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-            if vis then
-                local mag = (Vector2.new(pos.X,pos.Y) - circle.Position).Magnitude
-                if mag < dist then
-                    dist = mag
-                    closest = v
+        local box = Drawing.new("Square")
+        local line = Drawing.new("Line")
+        local text = Drawing.new("Text")
+
+        text.Size = 12
+        text.Center = true
+        text.Outline = true
+
+        RunService.RenderStepped:Connect(function()
+            local c = p.Character
+            if c and c:FindFirstChild("HumanoidRootPart") then
+                local hrp = c.HumanoidRootPart
+                local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
+
+                if vis and ESP then
+                    local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+                    local scale = math.clamp(1/(dist/300),0.3,1)
+
+                    box.Size = Vector2.new(30*scale,50*scale)
+                    box.Position = Vector2.new(pos.X-(15*scale),pos.Y-(25*scale))
+                    box.Color = Color3.fromRGB(255,0,0)
+                    box.Visible = true
+
+                    text.Position = Vector2.new(pos.X,pos.Y-(30*scale))
+                    text.Text = p.Name.." ["..math.floor(dist).."m]"
+                    text.Visible = true
+
+                    if LINE then
+                        line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+                        line.To = Vector2.new(pos.X,pos.Y)
+                        line.Color = Color3.fromRGB(0,255,0)
+                        line.Visible = true
+                    else
+                        line.Visible = false
+                    end
+                else
+                    box.Visible = false
+                    line.Visible = false
+                    text.Visible = false
                 end
             end
-        end
+        end)
     end
 
-    if closest and closest.Character then
-        local target = closest.Character.HumanoidRootPart.Position
+    for _,v in pairs(Players:GetPlayers()) do esp(v) end
+    Players.PlayerAdded:Connect(esp)
+end
 
-        if AIM then
-            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, target), SMOOTH)
-        end
-
-        if SILENT then
-            -- fake silent (look nhanh)
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target)
-        end
+-- LOGIN CHECK
+btn.MouseButton1Click:Connect(function()
+    if box.Text == PASSWORD then
+        createMenu()
+    else
+        box.Text = ""
+        box.PlaceholderText = "Sai mật khẩu!"
     end
 end)
