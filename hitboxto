@@ -1,4 +1,4 @@
---// VANDATDZ ESP + AIMLOOK (DRAG MENU)
+--// VANDATDZ MENU FIX (HIỆN 100%)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -10,46 +10,53 @@ local Camera = workspace.CurrentCamera
 local ESP_ENABLED = true
 local AIMLOOK_ENABLED = false
 
--- GUI
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+-- GUI (FIX)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Name = "VANDATDZ_GUI"
 
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,180,0,140)
-Main.Position = UDim2.new(0,50,0,200)
-Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Main.Size = UDim2.new(0,200,0,150)
+Main.Position = UDim2.new(0,100,0,200)
+Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Main.BorderSizePixel = 0
+Main.ZIndex = 10
 
 local TopBar = Instance.new("TextLabel", Main)
 TopBar.Size = UDim2.new(1,0,0,30)
 TopBar.BackgroundColor3 = Color3.fromRGB(0,0,0)
 TopBar.Text = "VANDATDZ MENU"
 TopBar.TextColor3 = Color3.fromRGB(255,255,255)
+TopBar.ZIndex = 11
 
--- ESP Button
+-- ESP BUTTON
 local ToggleESP = Instance.new("TextButton", Main)
 ToggleESP.Size = UDim2.new(1,-20,0,30)
 ToggleESP.Position = UDim2.new(0,10,0,40)
 ToggleESP.Text = "ESP: ON"
 ToggleESP.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleESP.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleESP.ZIndex = 11
 
--- AIM Button
+-- AIM BUTTON
 local ToggleAim = Instance.new("TextButton", Main)
 ToggleAim.Size = UDim2.new(1,-20,0,30)
 ToggleAim.Position = UDim2.new(0,10,0,80)
 ToggleAim.Text = "AIM: OFF"
 ToggleAim.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleAim.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleAim.ZIndex = 11
 
--- DRAG
+-- DRAG FIX
 local dragging = false
-local dragInput, mousePos, framePos
+local dragStart, startPos
 
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
-        mousePos = input.Position
-        framePos = Main.Position
+        dragStart = input.Position
+        startPos = Main.Position
 
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
@@ -59,49 +66,39 @@ TopBar.InputBegan:Connect(function(input)
     end
 end)
 
-TopBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
-
 UIS.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - mousePos
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
         Main.Position = UDim2.new(
-            framePos.X.Scale,
-            framePos.X.Offset + delta.X,
-            framePos.Y.Scale,
-            framePos.Y.Offset + delta.Y
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
         )
     end
 end)
 
--- Toggle ESP
+-- TOGGLE
 ToggleESP.MouseButton1Click:Connect(function()
     ESP_ENABLED = not ESP_ENABLED
     ToggleESP.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
 end)
 
--- Toggle AIM
 ToggleAim.MouseButton1Click:Connect(function()
     AIMLOOK_ENABLED = not AIMLOOK_ENABLED
     ToggleAim.Text = "AIM: "..(AIMLOOK_ENABLED and "ON" or "OFF")
 end)
 
--- Get closest player
+-- GET CLOSEST
 local function GetClosestPlayer()
-    local closest = nil
-    local shortest = math.huge
+    local closest, dist = nil, math.huge
 
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local hrp = player.Character.HumanoidRootPart
-            local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-
-            if dist < shortest then
-                shortest = dist
-                closest = player
+    for _,v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            local mag = (LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+            if mag < dist then
+                dist = mag
+                closest = v
             end
         end
     end
@@ -109,7 +106,7 @@ local function GetClosestPlayer()
     return closest
 end
 
--- AimLook
+-- AIM
 RunService.RenderStepped:Connect(function()
     if AIMLOOK_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local target = GetClosestPlayer()
@@ -128,41 +125,25 @@ local function CreateESP(player)
     Box.Thickness = 2
     Box.Filled = false
 
-    local Text = Drawing.new("Text")
-    Text.Size = 13
-    Text.Color = Color3.fromRGB(255,255,255)
-    Text.Center = true
-    Text.Outline = true
-
     RunService.RenderStepped:Connect(function()
         if not ESP_ENABLED then
             Box.Visible = false
-            Text.Visible = false
             return
         end
 
         local char = player.Character
         if char and char:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character then
-            local hrp = char.HumanoidRootPart
-            local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+            local pos, visible = Camera:WorldToViewportPoint(char.HumanoidRootPart.Position)
 
-            if onScreen then
-                local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
-
+            if visible then
                 Box.Size = Vector2.new(50,80)
                 Box.Position = Vector2.new(pos.X - 25, pos.Y - 40)
                 Box.Visible = true
-
-                Text.Position = Vector2.new(pos.X, pos.Y - 50)
-                Text.Text = player.Name.." ["..dist.."m]"
-                Text.Visible = true
             else
                 Box.Visible = false
-                Text.Visible = false
             end
         else
             Box.Visible = false
-            Text.Visible = false
         end
     end)
 end
