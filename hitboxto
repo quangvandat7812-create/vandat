@@ -1,110 +1,302 @@
-local Debris = game:GetService("Debris") -- Dùng để tự dọn dẹp VFX
+--// VANDATDZ ESP FULL VIP ULTIMATE
 
--- --- CẤU HÌNH CHIÊU THỨC ---
-local HITBOX_RADIUS = 50 -- Bán kính Hitbox (Cực to, nửa bản đồ nhỏ)
-local DAMAGE = 1000      -- Sát thương 1,000
-local KNOCKBACK_FORCE = 150 -- Lực đẩy văng kẻ địch (Rất mạnh)
-local COOLDOWN = 10      -- Thời gian hồi chiêu (giây)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
-local db = false -- Trạng thái hồi chiêu (Debounce)
+-- KEY
+local KEY = "vandatdz"
+local LINK = "https://your-link-here.com"
 
--- --- HÀM TẠO VFX HITBOX TRỰC QUAN (Cho người chơi thấy độ TO) ---
-local function CreateVisualHitbox(position)
-	-- Tạo một khối cầu bán trong suốt để biểu diễn vùng sát thương
-	local sphere = Instance.new("Part")
-	sphere.Name = "SlashVFX"
-	sphere.Shape = Enum.PartType.Ball
-	sphere.Material = Enum.Material.ForceField -- Nhìn ảo diệu
-	sphere.Color = Color3.fromRGB(255, 0, 0) -- Màu đỏ cảnh báo
-	sphere.Transparency = 0.5
-	sphere.Anchored = true
-	sphere.CanCollide = false
-	sphere.Position = position
-	
-	-- Kích thước ban đầu nhỏ, sau đó phình to ra
-	sphere.Size = Vector3.new(1, 1, 1)
-	sphere.Parent = workspace
-	
-	-- TweenService để làm hiệu ứng phình to mượt mà (Tùy chọn, ở đây làm thủ công cho đơn giản)
-	local finalSize = Vector3.new(HITBOX_RADIUS * 2, HITBOX_RADIUS * 2, HITBOX_RADIUS * 2)
-	
-	-- Hiệu ứng phình to nhanh
-	local tweenService = game:GetService("TweenService")
-	local info = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-	local tween = tweenService:Create(sphere, info, {Size = finalSize, Transparency = 1})
-	tween:Play()
-	
-	-- Tự xóa sau 0.5 giây
-	Debris:AddItem(sphere, 0.5)
+-- SETTINGS
+local ESP, LINE, HITBOX, AIMLOCK, SKELETON = true, true, false, false, true
+local AIM_FOV = 150
+
+-- SAVE KEY
+local FILE = "vandat_key.txt"
+local EXPIRE = 86400
+
+local function saveKey(key)
+    if writefile then
+        writefile(FILE, HttpService:JSONEncode({key=key,time=os.time()}))
+    end
 end
 
--- --- HÀM XỬ LÝ GÂY SÁT THƯƠNG ---
-local function PerformUltimateAttack(player)
-	if db then return end -- Đang hồi chiêu thì không cho dùng
-	db = true
-	
-	local character = player.Character
-	if not character or not character:FindFirstChild("HumanoidRootPart") then 
-		db = false 
-		return 
-	end
-	
-	local rootPart = character.HumanoidRootPart
-	local attackOrigin = rootPart.Position
-	
-	print("--- KÍCH HOẠT TUYỆT CHIÊU (HITBOX TO) ---")
-	
-	-- 1. Tạo hiệu ứng Visual
-	CreateVisualHitbox(attackOrigin)
-	
-	-- 2. Thiết lập thông số quét Hitbox
-	local overlapParams = OverlapParams.new()
-	overlapParams.FilterDescendantsInstances = {character} -- Không tự chém mình
-	overlapParams.FilterType = Enum.RaycastFilterType.Exclude
-	overlapParams.CollisionGroup = "Default" -- Hoặc nhóm va chạm cụ thể của bạn
-
-	-- 3. QUÉT HITBOX CỰC LỚN (Spatial Query)
-	local partsInHitbox = workspace:GetPartBoundsInRadius(attackOrigin, HITBOX_RADIUS, overlapParams)
-	
-	local hitHumanoids = {} -- Bảng ghi nhớ để không gây sát thương 2 lần trên 1 mục tiêu
-
-	-- 4. Xử lý kết quả quét
-	for _, part in pairs(partsInHitbox) do
-		local model = part.Parent
-		local humanoid = model:FindFirstChild("Humanoid")
-		local targetRoot = model:FindFirstChild("HumanoidRootPart")
-		
-		-- Kiểm tra hợp lệ và chưa bị hit
-		if humanoid and targetRoot and humanoid.Health > 0 and not hitHumanoids[humanoid] then
-			hitHumanoids[humanoid] = true -- Đánh dấu đã trúng
-			
-			-- >>> GÂY SÁT THƯƠNG 1,000 <<<
-			humanoid:TakeDamage(DAMAGE)
-			
-			-- >>> HIỆU ỨNG ĐẨY LÙI CỰC MẠNH <<<
-			-- Tính hướng vector từ tâm đến mục tiêu
-			local pushDirection = (targetRoot.Position - attackOrigin).Unit
-			-- Đẩy mục tiêu văng ra và hơi nảy lên trời
-			targetRoot.AssemblyLinearVelocity = (pushDirection + Vector3.new(0, 0.3, 0)) * KNOCKBACK_FORCE
-			
-			-- Tạo hiệu ứng máu hoặc particle nhỏ trên kẻ địch (Tùy chọn)
-			print("Đã chém trúng: " .. model.Name .. " với 1k Damage!")
-		end
-	end
-	
-	-- 5. Thời gian hồi chiêu
-	task.wait(COOLDOWN)
-	db = false
-	print("--- TUYỆT CHIÊU ĐÃ HỒI ---")
+local function loadKey()
+    if readfile and isfile and isfile(FILE) then
+        local data = HttpService:JSONDecode(readfile(FILE))
+        if os.time() - data.time <= EXPIRE then
+            return data.key
+        end
+    end
 end
 
--- --- LẮP ĐẶT SỰ KIỆN (Để test) ---
--- Trong thực tế, bạn sẽ nối hàm PerformUltimateAttack với một RemoteEvent từ Client khi nhấn phím
--- Ví dụ này dùng sự kiện PlayerAdded để test: Chém ngay khi spawn (chỉ để test)
+--================ LOGIN =================--
 
-game.Players.PlayerAdded:Connect(function(player)
-	player.CharacterAdded:Connect(function(character)
-		task.wait(2) -- Chờ load xong
-		PerformUltimateAttack(player)
-	end)
+local gui = Instance.new("ScreenGui", game.CoreGui)
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,260,0,180)
+frame.Position = UDim2.new(0.5,-130,0.5,-90)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", frame)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,40)
+title.Text = "Login Menu VanDatdz"
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.8,0,0,35)
+box.Position = UDim2.new(0.1,0,0.4,0)
+box.PlaceholderText = "Enter key..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.4,0,0,30)
+btn.Position = UDim2.new(0.1,0,0.75,0)
+btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+Instance.new("UICorner", btn)
+
+local linkBtn = Instance.new("TextButton", frame)
+linkBtn.Size = UDim2.new(0.4,0,0,30)
+linkBtn.Position = UDim2.new(0.5,0,0.75,0)
+linkBtn.Text = "GET KEY"
+linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
+Instance.new("UICorner", linkBtn)
+
+linkBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(LINK)
+        linkBtn.Text = "Copied!"
+        task.wait(1)
+        linkBtn.Text = "GET KEY"
+    end
+end)
+
+--================ MENU =================--
+
+local function createMenu()
+    frame:Destroy()
+
+    local main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0,240,0,260)
+    main.Position = UDim2.new(0,20,0,200)
+    main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Instance.new("UICorner", main)
+
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1,0,0,30)
+    title.Text = "Menu Vandatdz Esp"
+    title.TextColor3 = Color3.fromRGB(0,255,255)
+    title.BackgroundTransparency = 1
+
+    local function toggle(name,y,state,callback)
+        local b = Instance.new("TextButton", main)
+        b.Size = UDim2.new(0.8,0,0,30)
+        b.Position = UDim2.new(0.1,0,0,y)
+        b.Text = name..": "..(state and "ON" or "OFF")
+        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+        Instance.new("UICorner", b)
+
+        b.MouseButton1Click:Connect(function()
+            state = not state
+            b.Text = name..": "..(state and "ON" or "OFF")
+            callback(state)
+        end)
+    end
+
+    toggle("ESP",40,ESP,function(v) ESP=v end)
+    toggle("LINE",80,LINE,function(v) LINE=v end)
+    toggle("HITBOX",120,HITBOX,function(v) HITBOX=v end)
+    toggle("AIMLOCK",160,AIMLOCK,function(v) AIMLOCK=v end)
+    toggle("SKELETON",200,SKELETON,function(v) SKELETON=v end)
+
+    -- DRAG
+    local drag, start, pos
+    main.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch then
+            drag=true start=i.Position pos=main.Position
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(i)
+        if drag and i.UserInputType == Enum.UserInputType.Touch then
+            local d=i.Position-start
+            main.Position=UDim2.new(pos.X.Scale,pos.X.Offset+d.X,pos.Y.Scale,pos.Y.Offset+d.Y)
+        end
+    end)
+
+    UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.Touch then drag=false end
+    end)
+
+    -- LOGO
+    local logo = Instance.new("ImageButton", gui)
+    logo.Size = UDim2.new(0,65,0,65)
+    logo.Position = UDim2.new(1,-80,0,120)
+    logo.Image = "rbxassetid://127839480332201"
+    logo.BackgroundTransparency = 1
+
+    local open = true
+    logo.MouseButton1Click:Connect(function()
+        open = not open
+        main.Visible = open
+    end)
+end
+
+--================ HITBOX (RED BODY) =================--
+
+local function hitbox(p)
+    local h
+
+    local function apply(c)
+        if h then h:Destroy() end
+        h = Instance.new("Highlight")
+        h.FillColor = Color3.fromRGB(255,0,0)
+        h.FillTransparency = 0.5
+        h.OutlineColor = Color3.fromRGB(255,0,0)
+        h.Adornee = c
+        h.Parent = c
+    end
+
+    p.CharacterAdded:Connect(function(c)
+        task.wait(0.5)
+        if HITBOX then apply(c) end
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        local c = p.Character
+        if c then
+            if HITBOX then
+                if not h then apply(c) end
+            else
+                if h then h:Destroy() h=nil end
+            end
+        end
+    end)
+end
+
+--================ AIMLOCK =================--
+
+local function getClosest()
+    local target,dist=nil,AIM_FOV
+    for _,v in pairs(Players:GetPlayers()) do
+        if v~=LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local pos,vis=Camera:WorldToViewportPoint(v.Character.Head.Position)
+            if vis then
+                local d=(Vector2.new(pos.X,pos.Y)-Camera.ViewportSize/2).Magnitude
+                if d<dist then dist=d target=v end
+            end
+        end
+    end
+    return target
+end
+
+RunService.RenderStepped:Connect(function()
+    if AIMLOCK then
+        local t=getClosest()
+        if t and t.Character then
+            Camera.CFrame=CFrame.new(Camera.CFrame.Position,t.Character.Head.Position)
+        end
+    end
+end)
+
+--================ ESP + SKELETON =================--
+
+local function esp(p)
+    if p==LocalPlayer then return end
+
+    local line=Drawing.new("Line")
+    local text=Drawing.new("Text")
+
+    local bones={}
+    local function lineBone()
+        local l=Drawing.new("Line")
+        l.Thickness=1
+        return l
+    end
+
+    bones = {
+        lineBone(),lineBone(),lineBone(),lineBone(),lineBone()
+    }
+
+    RunService.RenderStepped:Connect(function()
+        if not p.Parent then
+            line:Remove() text:Remove()
+            for _,b in pairs(bones) do b:Remove() end
+            return
+        end
+
+        local c=p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            local pos,vis=Camera:WorldToViewportPoint(c.HumanoidRootPart.Position)
+
+            if ESP and vis then
+                text.Text="@"..p.Name
+                text.Position=Vector2.new(pos.X,pos.Y-30)
+                text.Visible=true
+
+                if LINE then
+                    line.From=Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+                    line.To=Vector2.new(pos.X,pos.Y)
+                    line.Visible=true
+                else line.Visible=false end
+            else
+                text.Visible=false line.Visible=false
+            end
+
+            if SKELETON and c:FindFirstChild("Head") then
+                local parts={"Head","HumanoidRootPart"}
+                local pts={}
+                for _,part in pairs(parts) do
+                    local p2,vis2=Camera:WorldToViewportPoint(c[part].Position)
+                    pts[part]=Vector2.new(p2.X,p2.Y)
+                end
+                bones[1].From=pts.Head
+                bones[1].To=pts.HumanoidRootPart
+                bones[1].Visible=true
+            else
+                for _,b in pairs(bones) do b.Visible=false end
+            end
+        end
+    end)
+end
+
+--================ START =================--
+
+local function start()
+    createMenu()
+    for _,v in pairs(Players:GetPlayers()) do
+        esp(v)
+        hitbox(v)
+    end
+    Players.PlayerAdded:Connect(function(v)
+        esp(v)
+        hitbox(v)
+    end)
+end
+
+-- AUTO LOGIN
+if loadKey()==KEY then
+    task.wait(0.5)
+    start()
+end
+
+btn.MouseButton1Click:Connect(function()
+    if box.Text==KEY then
+        saveKey(KEY)
+        start()
+    else
+        box.Text=""
+        box.PlaceholderText="Sai key!"
+    end
 end)
