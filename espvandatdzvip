@@ -1,3 +1,6 @@
+-- LOAD GAME
+repeat wait() until game:IsLoaded()
+
 --// LOGIN SYSTEM VANDATDZ (FULL)
 
 local Players = game:GetService("Players")
@@ -33,6 +36,7 @@ end
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0,300,0,220)
@@ -74,6 +78,18 @@ Status.Position = UDim2.new(0,0,1,-20)
 Status.BackgroundTransparency = 1
 Status.TextColor3 = Color3.fromRGB(255,0,0)
 
+-- 🔥 NÚT MỞ MENU
+local OpenBtn = Instance.new("TextButton", ScreenGui)
+OpenBtn.Size = UDim2.new(0,120,0,40)
+OpenBtn.Position = UDim2.new(0,20,0,200)
+OpenBtn.Text = "VANDATDZ"
+OpenBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+OpenBtn.TextColor3 = Color3.new(1,1,1)
+
+OpenBtn.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+end)
+
 -- DRAG
 local dragging, dragInput, dragStart, startPos
 
@@ -88,7 +104,9 @@ local function update(input)
 end
 
 Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+    or input.UserInputType == Enum.UserInputType.Touch then
+
         dragging = true
         dragStart = input.Position
         startPos = Frame.Position
@@ -102,7 +120,8 @@ Frame.InputBegan:Connect(function(input)
 end)
 
 Frame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
+    if input.UserInputType == Enum.UserInputType.MouseMovement 
+    or input.UserInputType == Enum.UserInputType.Touch then
         dragInput = input
     end
 end)
@@ -124,9 +143,8 @@ local function successLogin()
     })
 
     wait(1)
-    Frame:Destroy()
+    Frame.Visible = false -- 🔥 không xoá nữa
 
-    -- FIX: chạy script thay vì print + sửa lỗi dấu "
     loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/main/esp.lua"))()
 end
 
@@ -152,7 +170,7 @@ GetKey.MouseButton1Click:Connect(function()
     end
 end)
 
--- AUTO LOGIN (FIX lỗi nil time)
+-- AUTO LOGIN
 local data = loadData()
 if data and data.key == VALID_KEY and data.time then
     if os.time() - data.time < KEY_DURATION then
