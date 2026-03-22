@@ -1,4 +1,4 @@
---// VANDATDZ ESP + AIM + DRAG MENU (FIX FULL)
+--// VANDATDZ FULL (ESP + AIMLOOK + DRAG + LOGO)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -14,53 +14,74 @@ local AIMLOOK_ENABLED = false
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
+ScreenGui.Name = "VANDATDZ_GUI"
 
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,200,0,150)
+Main.Size = UDim2.new(0,220,0,180)
 Main.Position = UDim2.new(0,100,0,200)
-Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Main.BorderSizePixel = 0
 
-local TopBar = Instance.new("TextLabel", Main)
-TopBar.Size = UDim2.new(1,0,0,30)
-TopBar.BackgroundColor3 = Color3.fromRGB(0,0,0)
-TopBar.Text = "VANDATDZ MENU"
-TopBar.TextColor3 = Color3.fromRGB(255,255,255)
+-- LOGO
+local Logo = Instance.new("ImageLabel", Main)
+Logo.Size = UDim2.new(0,40,0,40)
+Logo.Position = UDim2.new(0,5,0,5)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://127839480332201" -- logo bạn
 
+-- TITLE
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1,-50,0,30)
+Title.Position = UDim2.new(0,50,0,10)
+Title.BackgroundTransparency = 1
+Title.Text = "VANDATDZ MENU"
+Title.TextColor3 = Color3.fromRGB(0,170,255)
+Title.TextSize = 16
+Title.Font = Enum.Font.SourceSansBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ESP BUTTON
 local ToggleESP = Instance.new("TextButton", Main)
-ToggleESP.Size = UDim2.new(1,-20,0,30)
-ToggleESP.Position = UDim2.new(0,10,0,40)
+ToggleESP.Size = UDim2.new(1,-20,0,35)
+ToggleESP.Position = UDim2.new(0,10,0,60)
 ToggleESP.Text = "ESP: ON"
 ToggleESP.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleESP.TextColor3 = Color3.fromRGB(255,255,255)
 
+-- AIM BUTTON
 local ToggleAim = Instance.new("TextButton", Main)
-ToggleAim.Size = UDim2.new(1,-20,0,30)
-ToggleAim.Position = UDim2.new(0,10,0,80)
+ToggleAim.Size = UDim2.new(1,-20,0,35)
+ToggleAim.Position = UDim2.new(0,10,0,105)
 ToggleAim.Text = "AIM: OFF"
 ToggleAim.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleAim.TextColor3 = Color3.fromRGB(255,255,255)
 
--- DRAG CHUẨN (FIX)
+-- DRAG (CHUẨN 100%)
 local dragging = false
-local dragStart
-local startPos
+local dragInput, dragStart, startPos
 
-TopBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
 		dragStart = input.Position
 		startPos = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
 end)
 
-TopBar.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
+Main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
 		Main.Position = UDim2.new(
 			startPos.X.Scale,
@@ -82,7 +103,7 @@ ToggleAim.MouseButton1Click:Connect(function()
 	ToggleAim.Text = "AIM: "..(AIMLOOK_ENABLED and "ON" or "OFF")
 end)
 
--- GET CLOSEST
+-- GET CLOSEST PLAYER
 local function GetClosestPlayer()
 	local closest, dist = nil, math.huge
 
@@ -109,7 +130,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- ESP FULL
+-- ESP
 local function CreateESP(player)
 	if player == LocalPlayer then return end
 
