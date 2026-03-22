@@ -1,4 +1,4 @@
---// VANDATDZ FULL VIP LOGIN
+--// VANDATDZ ESP FINAL FULL VIP
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -16,7 +16,7 @@ local ESP = true
 local LINE = true
 local HITBOX = false
 local AIMLOCK = false
-
+local SKELETON = true
 local HITBOX_SIZE = Vector3.new(3,3,3)
 local AIM_FOV = 150
 
@@ -43,7 +43,8 @@ local function loadKey()
     return nil
 end
 
--- GUI LOGIN
+--================ LOGIN =================--
+
 local gui = Instance.new("ScreenGui", game.CoreGui)
 
 local frame = Instance.new("Frame", gui)
@@ -54,26 +55,36 @@ Instance.new("UICorner", frame)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
-title.Text = "Vandatdz Login"
+title.Text = "Login Menu VanDatdz"
 title.TextColor3 = Color3.fromRGB(0,255,255)
 title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
 
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0.8,0,0,35)
 box.Position = UDim2.new(0.1,0,0.4,0)
 box.PlaceholderText = "Enter key..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
 
 local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0.4,0,0,30)
 btn.Position = UDim2.new(0.1,0,0.75,0)
 btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
 
 local linkBtn = Instance.new("TextButton", frame)
 linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
 linkBtn.Text = "OPEN LINK"
+linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
+linkBtn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", linkBtn)
 
--- COPY LINK
 linkBtn.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(LINK)
@@ -89,16 +100,36 @@ local function createMenu()
     frame:Destroy()
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,240,0,200)
+    main.Size = UDim2.new(0,240,0,240)
     main.Position = UDim2.new(0,20,0,200)
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
     Instance.new("UICorner", main)
 
+    -- TITLE
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1,0,0,30)
+    title.Text = "Menu Vandatdz Esp"
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(0,255,255)
+    title.Font = Enum.Font.GothamBold
+
+    -- CREDIT
+    local credit = Instance.new("TextLabel", main)
+    credit.Size = UDim2.new(1,0,0,20)
+    credit.Position = UDim2.new(0,0,1,-20)
+    credit.Text = "by:vandatdz"
+    credit.BackgroundTransparency = 1
+    credit.TextColor3 = Color3.fromRGB(150,150,150)
+
+    -- BUTTON FUNCTION
     local function button(name,y,state,callback)
         local b = Instance.new("TextButton", main)
         b.Size = UDim2.new(0.8,0,0,30)
         b.Position = UDim2.new(0.1,0,0,y)
         b.Text = name..": "..(state and "ON" or "OFF")
+        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+        b.TextColor3 = Color3.new(1,1,1)
+        Instance.new("UICorner", b)
 
         b.MouseButton1Click:Connect(function()
             state = not state
@@ -107,10 +138,37 @@ local function createMenu()
         end)
     end
 
-    button("ESP",40,ESP,function(v) ESP=v end)
-    button("LINE",80,LINE,function(v) LINE=v end)
-    button("HITBOX",120,HITBOX,function(v) HITBOX=v end)
-    button("AIMLOCK",160,AIMLOCK,function(v) AIMLOCK=v end)
+    button("ESP",50,ESP,function(v) ESP=v end)
+    button("LINE",90,LINE,function(v) LINE=v end)
+    button("HITBOX",130,HITBOX,function(v) HITBOX=v end)
+    button("AIMLOCK",170,AIMLOCK,function(v) AIMLOCK=v end)
+    button("SKELETON",210,SKELETON,function(v) SKELETON=v end)
+
+    -- DRAG MENU
+    local dragging, startPos, startInput
+    main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            startInput = input.Position
+            startPos = main.Position
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - startInput
+            main.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 
     -- LOGO
     local logo = Instance.new("ImageButton", gui)
@@ -129,9 +187,10 @@ end
 --================ FEATURES =================--
 
 local function applyHitbox(p)
-    RunService.RenderStepped:Connect(function()
-        if not HITBOX then return end
-        if p.Character and p.Character:FindFirstChild("Head") then
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if not p.Parent then conn:Disconnect() return end
+        if HITBOX and p.Character and p.Character:FindFirstChild("Head") then
             local h = p.Character.Head
             h.Size = HITBOX_SIZE
             h.Transparency = 0.3
@@ -166,20 +225,50 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- ESP SKELETON
 local function esp(p)
     if p == LocalPlayer then return end
 
     local line = Drawing.new("Line")
     local text = Drawing.new("Text")
 
-    RunService.RenderStepped:Connect(function()
-        if not p.Parent then return end
+    text.Size = 14
+    text.Center = true
+    text.Outline = true
+    text.Color = Color3.fromRGB(255,255,255)
+
+    local bones = {
+        {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
+        {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
+        {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
+        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"}
+    }
+
+    local skel = {}
+    for i = 1,#bones do
+        local l = Drawing.new("Line")
+        l.Thickness = 2
+        l.Color = Color3.fromRGB(255,255,255)
+        table.insert(skel,l)
+    end
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if not p.Parent then
+            line:Remove()
+            text:Remove()
+            for _,l in pairs(skel) do l:Remove() end
+            conn:Disconnect()
+            return
+        end
+
         local c = p.Character
         if c and c:FindFirstChild("HumanoidRootPart") then
             local hrp = c.HumanoidRootPart
-            local pos = Camera:WorldToViewportPoint(hrp.Position)
+            local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
 
-            if ESP then
+            if ESP and vis then
                 local name = p.DisplayName ~= "" and p.DisplayName or p.Name
                 text.Text = "@"..name
                 text.Position = Vector2.new(pos.X,pos.Y-30)
@@ -192,13 +281,44 @@ local function esp(p)
                 else
                     line.Visible = false
                 end
+
+                -- SKELETON
+                if SKELETON then
+                    for i,b in ipairs(bones) do
+                        local p1 = c:FindFirstChild(b[1],true)
+                        local p2 = c:FindFirstChild(b[2],true)
+                        if p1 and p2 then
+                            local a,v1 = Camera:WorldToViewportPoint(p1.Position)
+                            local b2,v2 = Camera:WorldToViewportPoint(p2.Position)
+                            if v1 and v2 then
+                                skel[i].From = Vector2.new(a.X,a.Y)
+                                skel[i].To = Vector2.new(b2.X,b2.Y)
+                                skel[i].Visible = true
+                            else
+                                skel[i].Visible = false
+                            end
+                        else
+                            skel[i].Visible = false
+                        end
+                    end
+                else
+                    for _,l in pairs(skel) do l.Visible = false end
+                end
+
             else
                 text.Visible = false
                 line.Visible = false
+                for _,l in pairs(skel) do l.Visible = false end
             end
+        else
+            text.Visible = false
+            line.Visible = false
+            for _,l in pairs(skel) do l.Visible = false end
         end
     end)
 end
+
+--================ START =================--
 
 local function start()
     createMenu()
