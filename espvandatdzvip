@@ -1,8 +1,6 @@
 -- LOAD GAME
 repeat wait() until game:IsLoaded()
 
---// LOGIN SYSTEM VANDATDZ (FULL)
-
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
@@ -10,14 +8,12 @@ local LocalPlayer = Players.LocalPlayer
 -- FILE SAVE
 local FILE = "vandatdz_key.txt"
 
--- KEY SETTINGS
+-- KEY
 local VALID_KEY = "vandatdz"
-local KEY_DURATION = 24 * 60 * 60 -- 24h
+local KEY_DURATION = 24 * 60 * 60
 
--- LINK GET KEY
 local GET_KEY_LINK = "https://link4m.com/VMtwi"
 
--- SAVE / LOAD
 local HttpService = game:GetService("HttpService")
 
 local function saveData(data)
@@ -30,7 +26,6 @@ local function loadData()
     if readfile and isfile and isfile(FILE) then
         return HttpService:JSONDecode(readfile(FILE))
     end
-    return nil
 end
 
 -- GUI
@@ -38,7 +33,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- LOGIN FRAME
+-- LOGIN
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0,300,0,220)
 Frame.Position = UDim2.new(0.5,-150,0.5,-110)
@@ -63,14 +58,11 @@ Button.Size = UDim2.new(0.8,0,0,35)
 Button.Position = UDim2.new(0.1,0,0.55,0)
 Button.Text = "LOGIN"
 Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
-Button.TextColor3 = Color3.new(1,1,1)
 
 local GetKey = Instance.new("TextButton", Frame)
 GetKey.Size = UDim2.new(0.8,0,0,30)
 GetKey.Position = UDim2.new(0.1,0,0.75,0)
 GetKey.Text = "GET KEY"
-GetKey.BackgroundColor3 = Color3.fromRGB(50,50,50)
-GetKey.TextColor3 = Color3.new(1,1,1)
 
 local Status = Instance.new("TextLabel", Frame)
 Status.Size = UDim2.new(1,0,0,20)
@@ -94,32 +86,18 @@ Title2.TextScaled = true
 
 local ESPBtn = Instance.new("TextButton", HackFrame)
 ESPBtn.Size = UDim2.new(0.8,0,0,35)
-ESPBtn.Position = UDim2.new(0.1,0,0.35,0)
+ESPBtn.Position = UDim2.new(0.1,0,0.4,0)
 ESPBtn.Text = "ESP: OFF"
 ESPBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-ESPBtn.TextColor3 = Color3.new(1,1,1)
-
-local NameBtn = Instance.new("TextButton", HackFrame)
-NameBtn.Size = UDim2.new(0.8,0,0,35)
-NameBtn.Position = UDim2.new(0.1,0,0.6,0)
-NameBtn.Text = "NAME: ON"
-NameBtn.BackgroundColor3 = Color3.fromRGB(100,200,255)
-NameBtn.TextColor3 = Color3.new(1,1,1)
 
 _G.ESP_ENABLED = false
-_G.NAME_ENABLED = true
 
 ESPBtn.MouseButton1Click:Connect(function()
     _G.ESP_ENABLED = not _G.ESP_ENABLED
     ESPBtn.Text = "ESP: " .. (_G.ESP_ENABLED and "ON" or "OFF")
 end)
 
-NameBtn.MouseButton1Click:Connect(function()
-    _G.NAME_ENABLED = not _G.NAME_ENABLED
-    NameBtn.Text = "NAME: " .. (_G.NAME_ENABLED and "ON" or "OFF")
-end)
-
--- OPEN MENU BUTTON
+-- LOGO (DRAG)
 local OpenBtn = Instance.new("TextButton", ScreenGui)
 OpenBtn.Size = UDim2.new(0,120,0,40)
 OpenBtn.Position = UDim2.new(0,20,0,200)
@@ -130,7 +108,7 @@ OpenBtn.MouseButton1Click:Connect(function()
     HackFrame.Visible = not HackFrame.Visible
 end)
 
--- DRAG (LOGIN + MENU)
+-- DRAG FUNCTION
 local function makeDraggable(obj)
     local dragging, dragInput, dragStart, startPos
 
@@ -172,6 +150,31 @@ end
 
 makeDraggable(Frame)
 makeDraggable(HackFrame)
+makeDraggable(OpenBtn) -- 🔥 FIX LOGO DRAG
+
+-- ESP REAL (FIX KHÔNG LỖI)
+task.spawn(function()
+    while true do
+        task.wait(1)
+
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character then
+
+                local char = plr.Character
+                local hl = char:FindFirstChild("Highlight")
+
+                if not hl then
+                    hl = Instance.new("Highlight")
+                    hl.FillColor = Color3.fromRGB(255,0,0)
+                    hl.OutlineColor = Color3.fromRGB(255,255,255)
+                    hl.Parent = char
+                end
+
+                hl.Enabled = _G.ESP_ENABLED
+            end
+        end
+    end
+end)
 
 -- LOGIN
 local function successLogin()
@@ -186,8 +189,6 @@ local function successLogin()
     wait(1)
     Frame.Visible = false
     HackFrame.Visible = true
-
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/main/esp.lua"))()
 end
 
 local function doLogin(key)
@@ -206,8 +207,6 @@ GetKey.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(GET_KEY_LINK)
         Status.Text = "Link copied!"
-    else
-        Status.Text = "Copy link manually!"
     end
 end)
 
