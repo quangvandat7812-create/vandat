@@ -1,96 +1,175 @@
---// ESP by vandatdz (UI đẹp)
+--// VANDATDZ MOBILE VIP
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local ESP_ENABLED = true
+-- SETTINGS
+local ESP = true
+local LINE = true
+local AIM = false
+local SILENT = false
+local FOV = 120
+local SMOOTH = 0.2
 
--- GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.CoreGui
+-- FOV
+local circle = Drawing.new("Circle")
+circle.Color = Color3.fromRGB(0,255,0)
+circle.Radius = FOV
+circle.Thickness = 1
+circle.Filled = false
 
-local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 180, 0, 100)
-Main.Position = UDim2.new(0, 20, 0, 200)
-Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
-Main.BorderSizePixel = 0
+-- GUI MOBILE
+local gui = Instance.new("ScreenGui", game.CoreGui)
 
--- Bo góc
-local UICorner = Instance.new("UICorner", Main)
-UICorner.CornerRadius = UDim.new(0, 10)
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,220,0,200)
+main.Position = UDim2.new(0,20,0,200)
+main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Instance.new("UICorner", main)
 
--- Gradient
-local UIGradient = Instance.new("UIGradient", Main)
-UIGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(40,40,40))
-}
+local function makeBtn(txt,y)
+    local b = Instance.new("TextButton", main)
+    b.Size = UDim2.new(0.8,0,0,35)
+    b.Position = UDim2.new(0.1,0,0,y)
+    b.Text = txt
+    b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    b.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", b)
+    return b
+end
 
--- Title
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,30)
-Title.Text = "ESP MENU"
-Title.TextColor3 = Color3.fromRGB(255,255,255)
-Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 16
+local espB = makeBtn("ESP: ON",20)
+local lineB = makeBtn("LINE: ON",60)
+local aimB = makeBtn("AIM: OFF",100)
+local silentB = makeBtn("SILENT: OFF",140)
 
--- Credit
-local Credit = Instance.new("TextLabel", Main)
-Credit.Size = UDim2.new(1,0,0,20)
-Credit.Position = UDim2.new(0,0,1,-20)
-Credit.Text = "by vandatdz"
-Credit.TextColor3 = Color3.fromRGB(150,150,150)
-Credit.BackgroundTransparency = 1
-Credit.Font = Enum.Font.Gotham
-Credit.TextSize = 12
-
--- Toggle Button
-local Toggle = Instance.new("TextButton", Main)
-Toggle.Size = UDim2.new(0.8,0,0,40)
-Toggle.Position = UDim2.new(0.1,0,0.4,0)
-Toggle.Text = "ESP: ON"
-Toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
-Toggle.TextColor3 = Color3.fromRGB(0,255,0)
-Toggle.Font = Enum.Font.GothamBold
-Toggle.TextSize = 14
-
-local UICorner2 = Instance.new("UICorner", Toggle)
-UICorner2.CornerRadius = UDim.new(0,8)
-
-Toggle.MouseButton1Click:Connect(function()
-    ESP_ENABLED = not ESP_ENABLED
-    Toggle.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
-    Toggle.TextColor3 = ESP_ENABLED and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+espB.MouseButton1Click:Connect(function()
+    ESP = not ESP
+    espB.Text = "ESP: "..(ESP and "ON" or "OFF")
 end)
 
--- Drag GUI
-local dragging, dragInput, dragStart, startPos
+lineB.MouseButton1Click:Connect(function()
+    LINE = not LINE
+    lineB.Text = "LINE: "..(LINE and "ON" or "OFF")
+end)
 
-Main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+aimB.MouseButton1Click:Connect(function()
+    AIM = not AIM
+    aimB.Text = "AIM: "..(AIM and "ON" or "OFF")
+end)
+
+silentB.MouseButton1Click:Connect(function()
+    SILENT = not SILENT
+    silentB.Text = "SILENT: "..(SILENT and "ON" or "OFF")
+end)
+
+-- DRAG MOBILE
+local dragging, dragInput, start, pos
+
+main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
-        dragStart = input.Position
-        startPos = Main.Position
-    end
-end)
-
-Main.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
+        start = input.Position
+        pos = main.Position
     end
 end)
 
 UIS.InputChanged:Connect(function(input)
-    if dragging then
-        local delta = input.Position - dragStart
-        Main.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
+    if dragging and input.UserInputType == Enum.UserInputType.Touch then
+        local delta = input.Position - start
+        main.Position = UDim2.new(pos.X.Scale,pos.X.Offset+delta.X,pos.Y.Scale,pos.Y.Offset+delta.Y)
+    end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- ESP
+local function esp(p)
+    if p == LocalPlayer then return end
+
+    local box = Drawing.new("Square")
+    local line = Drawing.new("Line")
+    local text = Drawing.new("Text")
+
+    text.Size = 13
+    text.Center = true
+    text.Outline = true
+
+    RunService.RenderStepped:Connect(function()
+        local c = p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") and c:FindFirstChild("Humanoid") then
+            local hrp = c.HumanoidRootPart
+            local hum = c.Humanoid
+            local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
+
+            if vis and ESP then
+                local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+                local scale = math.clamp(1/(dist/100),0.5,2)
+
+                box.Size = Vector2.new(50*scale,80*scale)
+                box.Position = Vector2.new(pos.X-(25*scale),pos.Y-(40*scale))
+                box.Color = Color3.fromRGB(255,0,0)
+                box.Visible = true
+
+                text.Position = Vector2.new(pos.X,pos.Y-(50*scale))
+                text.Text = p.Name.." | "..math.floor(hum.Health).."HP | "..math.floor(dist).."m"
+                text.Visible = true
+
+                if LINE then
+                    line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+                    line.To = Vector2.new(pos.X,pos.Y)
+                    line.Visible = true
+                else
+                    line.Visible = false
+                end
+            else
+                box.Visible = false
+                line.Visible = false
+                text.Visible = false
+            end
+        end
+    end)
+end
+
+for _,v in pairs(Players:GetPlayers()) do esp(v) end
+Players.PlayerAdded:Connect(esp)
+
+-- AIM + SILENT
+RunService.RenderStepped:Connect(function()
+    circle.Position = UIS:GetMouseLocation()
+
+    local closest, dist = nil, FOV
+
+    for _,v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            local pos, vis = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+            if vis then
+                local mag = (Vector2.new(pos.X,pos.Y) - circle.Position).Magnitude
+                if mag < dist then
+                    dist = mag
+                    closest = v
+                end
+            end
+        end
+    end
+
+    if closest and closest.Character then
+        local target = closest.Character.HumanoidRootPart.Position
+
+        if AIM then
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, target), SMOOTH)
+        end
+
+        if SILENT then
+            -- fake silent (look nhanh)
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target)
+        end
     end
 end)
