@@ -36,7 +36,7 @@ end
 local function loadKey()
     if readfile and isfile and isfile(FILE) then
         local data = HttpService:JSONDecode(readfile(FILE))
-        if os.time() - data.time <= EXPIRE then
+        if data and data.key and (os.time() - data.time <= EXPIRE) then
             return data.key
         end
     end
@@ -117,14 +117,19 @@ local function createMenu()
         local b = Instance.new("TextButton", main)
         b.Size = UDim2.new(0.8,0,0,30)
         b.Position = UDim2.new(0.1,0,0,y)
-        b.Text = name..": "..(state and "ON" or "OFF")
         b.BackgroundColor3 = Color3.fromRGB(40,40,40)
         b.TextColor3 = Color3.new(1,1,1)
         Instance.new("UICorner", b)
 
+        local function update()
+            b.Text = name..": "..(state and "ON" or "OFF")
+        end
+
+        update()
+
         b.MouseButton1Click:Connect(function()
             state = not state
-            b.Text = name..": "..(state and "ON" or "OFF")
+            update()
             callback(state)
         end)
     end
@@ -148,7 +153,7 @@ local function createMenu()
     end)
 end
 
---================ HITBOX FIX (ĐÃ SỬA) =================--
+--================ HITBOX FIX =================--
 
 local function applyHitbox(p)
     if p == LocalPlayer then return end
@@ -249,50 +254,4 @@ local function esp(p)
                 text.Visible = true
 
                 if LINE then
-                    line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
-                    line.To = Vector2.new(pos.X,pos.Y)
-                    line.Visible = true
-                else
-                    line.Visible = false
-                end
-            else
-                text.Visible = false
-                line.Visible = false
-            end
-        else
-            text.Visible = false
-            line.Visible = false
-        end
-    end)
-end
-
---================ START =================--
-
-local function start()
-    createMenu()
-    for _,v in pairs(Players:GetPlayers()) do
-        esp(v)
-        applyHitbox(v)
-    end
-    Players.PlayerAdded:Connect(function(v)
-        esp(v)
-        applyHitbox(v)
-    end)
-end
-
--- AUTO LOGIN
-local saved = loadKey()
-if saved == KEY then
-    task.wait(0.5)
-    start()
-end
-
-btn.MouseButton1Click:Connect(function()
-    if box.Text == KEY then
-        saveKey(KEY)
-        start()
-    else
-        box.Text = ""
-        box.PlaceholderText = "Sai key!"
-    end
-end)
+                    line.From = Vector2.new(Camera.ViewportSize
