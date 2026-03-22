@@ -1,4 +1,4 @@
---// VANDATDZ FINAL FULL (ESP + AIM + MENU + LOGO)
+--// VANDATDZ FULL PRO (ESP + AIM + TEAM + LOGO + HITBOX FULL BODY)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -8,6 +8,10 @@ local Camera = workspace.CurrentCamera
 
 local ESP_ENABLED = true
 local AIM_ENABLED = false
+local LOGO_ENABLED = true
+local HITBOX_ENABLED = false
+
+local HITBOX_SIZE = 5
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -15,7 +19,7 @@ ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,220,0,180)
+Main.Size = UDim2.new(0,220,0,260)
 Main.Position = UDim2.new(0,100,0,200)
 Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
 
@@ -35,6 +39,182 @@ Title.Size = UDim2.new(1,-50,0,30)
 Title.Position = UDim2.new(0,50,0,10)
 Title.BackgroundTransparency = 1
 Title.Text = "VANDATDZ MENU"
+Title.TextColor3 = Color3.fromRGB(0,170,255)
+Title.TextSize = 16
+Title.Font = Enum.Font.SourceSansBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- BUTTON
+local function createBtn(text,y)
+	local b = Instance.new("TextButton", Main)
+	b.Size = UDim2.new(1,-20,0,30)
+	b.Position = UDim2.new(0,10,0,y)
+	b.Text = text
+	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	b.TextColor3 = Color3.fromRGB(255,255,255)
+	return b
+end
+
+local ToggleESP = createBtn("ESP: ON",60)
+local ToggleAim = createBtn("AIM: OFF",95)
+local ToggleLogo = createBtn("LOGO: ON",130)
+local ToggleHitbox = createBtn("HITBOX: OFF",165)
+local SizeUp = createBtn("SIZE +",200)
+local SizeDown = createBtn("SIZE -",235)
+
+-- TOGGLE
+ToggleESP.MouseButton1Click:Connect(function()
+	ESP_ENABLED = not ESP_ENABLED
+	ToggleESP.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
+end)
+
+ToggleAim.MouseButton1Click:Connect(function()
+	AIM_ENABLED = not AIM_ENABLED
+	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
+end)
+
+ToggleLogo.MouseButton1Click:Connect(function()
+	LOGO_ENABLED = not LOGO_ENABLED
+	Logo.Visible = LOGO_ENABLED
+	ToggleLogo.Text = "LOGO: "..(LOGO_ENABLED and "ON" or "OFF")
+end)
+
+ToggleHitbox.MouseButton1Click:Connect(function()
+	HITBOX_ENABLED = not HITBOX_ENABLED
+	ToggleHitbox.Text = "HITBOX: "..(HITBOX_ENABLED and "ON" or "OFF")
+end)
+
+SizeUp.MouseButton1Click:Connect(function()
+	HITBOX_SIZE = HITBOX_SIZE + 1
+end)
+
+SizeDown.MouseButton1Click:Connect(function()
+	HITBOX_SIZE = math.max(2, HITBOX_SIZE - 1)
+end)
+
+-- HITBOX FULL BODY (FIX)
+local function ApplyHitbox(char)
+	for _,part in pairs(char:GetChildren()) do
+		if part:IsA("BasePart") then
+
+			if not part:FindFirstChild("OriginalSize") then
+				local val = Instance.new("Vector3Value")
+				val.Name = "OriginalSize"
+				val.Value = part.Size
+				val.Parent = part
+			end
+
+			if HITBOX_ENABLED then
+				part.Size = Vector3.new(HITBOX_SIZE,HITBOX_SIZE,HITBOX_SIZE)
+				part.Transparency = 0.5
+				part.Material = Enum.Material.Neon
+				part.Color = Color3.fromRGB(255,0,0)
+				part.CanCollide = false
+			else
+				local original = part:FindFirstChild("OriginalSize")
+				if original then
+					part.Size = original.Value
+				end
+				part.Transparency = 0
+				part.Material = Enum.Material.Plastic
+			end
+		end
+	end
+end
+
+-- ESP + HITBOX
+local function SetupESP(player)
+	if player == LocalPlayer then return end
+
+	local function Apply(char)
+		local hrp = char:WaitForChild("HumanoidRootPart",10)
+		if not hrp then return end
+
+		if char:FindFirstChild("VANDATDZ_ESP") then return end
+
+		local folder = Instance.new("Folder", char)
+		folder.Name = "VANDATDZ_ESP"
+
+		local hl = Instance.new("Highlight", folder)
+
+		local bill = Instance.new("BillboardGui", folder)
+		bill.Size = UDim2.new(0,120,0,40)
+		bill.AlwaysOnTop = true
+		bill.Adornee = hrp
+
+		local text = Instance.new("TextLabel", bill)
+		text.Size = UDim2.new(1,0,1,0)
+		text.BackgroundTransparency = 1
+		text.TextScaled = true
+
+		RunService.RenderStepped:Connect(function()
+			if not char or not char.Parent then return end
+
+			-- ESP
+			if ESP_ENABLED then
+				hl.Enabled = true
+				bill.Enabled = true
+
+				if player.Team == LocalPlayer.Team then
+					hl.FillColor = Color3.fromRGB(0,255,0)
+					text.TextColor3 = Color3.fromRGB(0,255,0)
+				else
+					hl.FillColor = Color3.fromRGB(255,0,0)
+					text.TextColor3 = Color3.fromRGB(255,0,0)
+				end
+
+				if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+					local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
+					text.Text = player.Name.." ["..dist.."m]"
+				end
+			else
+				hl.Enabled = false
+				bill.Enabled = false
+			end
+
+			-- HITBOX FULL BODY
+			ApplyHitbox(char)
+		end)
+	end
+
+	task.spawn(function()
+		if player.Character then
+			Apply(player.Character)
+		end
+		player.CharacterAdded:Connect(function(c)
+			task.wait(0.5)
+			Apply(c)
+		end)
+	end)
+end
+
+-- LOAD
+for _,v in ipairs(Players:GetPlayers()) do
+	SetupESP(v)
+end
+
+Players.PlayerAdded:Connect(SetupESP)
+
+-- AIM
+local function GetClosest()
+	local c,d=nil,math.huge
+	for _,v in pairs(Players:GetPlayers()) do
+		if v~=LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+			local m=(LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+			if m<d then d=m c=v end
+		end
+	end
+	return c
+end
+
+RunService.RenderStepped:Connect(function()
+	if AIM_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local t=GetClosest()
+		if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+			Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Character.HumanoidRootPart.Position)
+		end
+	end
+end)Title.Text = "VANDATDZ MENU"
 Title.TextColor3 = Color3.fromRGB(0,170,255)
 Title.TextSize = 16
 Title.Font = Enum.Font.SourceSansBold
