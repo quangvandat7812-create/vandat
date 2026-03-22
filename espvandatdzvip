@@ -12,7 +12,7 @@ local VALID_KEY = "vandatdz"
 local KEY_DURATION = 24 * 60 * 60 -- 24h
 
 -- LINK GET KEY
-local GET_KEY_LINK = "https://your-link.com" -- 👉 đổi link tại đây
+local GET_KEY_LINK = "https://link4m.com/VMtwi" -- 👉 đổi link tại đây
 
 -- SAVE / LOAD
 local HttpService = game:GetService("HttpService")
