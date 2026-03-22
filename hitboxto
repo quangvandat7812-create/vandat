@@ -1,4 +1,4 @@
---// VANDATDZ ESP FINAL (FIX ALL NO BUG)
+--// VANDATDZ ESP FINAL FULL VIP (FINAL FIX ALL)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -42,7 +42,7 @@ local function loadKey()
     return k
 end
 
---================ LOGIN =================--
+--================ GUI LOGIN =================--
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
 
@@ -52,31 +52,104 @@ frame.Position = UDim2.new(0.5,-130,0.5,-90)
 frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Instance.new("UICorner", frame)
 
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,40)
+title.Text = "Login Menu VanDatdz"
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0.8,0,0,35)
 box.Position = UDim2.new(0.1,0,0.4,0)
 box.PlaceholderText = "Enter key..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
 
 local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0.4,0,0,30)
 btn.Position = UDim2.new(0.3,0,0.75,0)
 btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
 
 --================ MENU =================--
 
-local main
-
 local function createMenu()
+
     frame:Destroy()
 
-    main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,220,0,200)
+    local main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0,250,0,260)
     main.Position = UDim2.new(0,20,0,200)
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    main.Active = true
     Instance.new("UICorner", main)
 
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1,0,0,35)
+    title.Text = "Menu Vandatdz ESP"
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(0,255,255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+
+    local function createBtn(text, y, state, callback)
+        local b = Instance.new("TextButton", main)
+        b.Size = UDim2.new(0.85,0,0,35)
+        b.Position = UDim2.new(0.075,0,0,y)
+        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+        b.TextColor3 = Color3.new(1,1,1)
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 16
+        Instance.new("UICorner", b)
+
+        local function update()
+            b.Text = text.." : "..(state and "ON" or "OFF")
+        end
+
+        update()
+
+        b.MouseButton1Click:Connect(function()
+            state = not state
+            update()
+            callback(state)
+        end)
+    end
+
+    createBtn("ESP",50,ESP,function(v) ESP=v end)
+    createBtn("LINE",95,LINE,function(v) LINE=v end)
+    createBtn("HITBOX",140,HITBOX,function(v) HITBOX=v end)
+    createBtn("AIMLOCK",185,AIMLOCK,function(v) AIMLOCK=v end)
+
+    -- DRAG MENU
+    local dragging, dragStart, startPos
+
+    main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    UIS.InputEnded:Connect(function()
+        dragging = false
+    end)
+
+    -- LOGO
     local logo = Instance.new("ImageButton", gui)
-    logo.Size = UDim2.new(0,60,0,60)
+    logo.Size = UDim2.new(0,65,0,65)
     logo.Position = UDim2.new(1,-80,0,120)
     logo.Image = "https://www.roblox.com/asset/?id=127839480332201"
     logo.BackgroundTransparency = 1
@@ -88,25 +161,25 @@ local function createMenu()
     end)
 
     -- DRAG LOGO
-    local dragging, startPos, startInput
+    local draggingLogo, dragStartLogo, startPosLogo
 
     logo.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            startInput = input.Position
-            startPos = logo.Position
+            draggingLogo = true
+            dragStartLogo = input.Position
+            startPosLogo = logo.Position
         end
     end)
 
     UIS.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - startInput
-            logo.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        if draggingLogo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStartLogo
+            logo.Position = UDim2.new(startPosLogo.X.Scale, startPosLogo.X.Offset + delta.X, startPosLogo.Y.Scale, startPosLogo.Y.Offset + delta.Y)
         end
     end)
 
     UIS.InputEnded:Connect(function()
-        dragging = false
+        draggingLogo = false
     end)
 end
 
@@ -140,7 +213,7 @@ local function removePlayer(p)
     end
 end
 
---================ LOOP =================--
+--================ MAIN LOOP =================--
 
 RunService.RenderStepped:Connect(function()
 
@@ -158,7 +231,7 @@ RunService.RenderStepped:Connect(function()
 
         -- ESP
         if ESP and vis then
-            data.text.Text = p.Name
+            data.text.Text = "@"..p.Name
             data.text.Position = Vector2.new(pos.X,pos.Y-30)
             data.text.Visible = true
         else
