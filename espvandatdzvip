@@ -1,62 +1,66 @@
---// VANDATDZ PRO MAX FULL
+--// VANDATDZ LOGIN ESP FULL
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
---================ KEY SYSTEM =================--
+-- KEY
+local KEY = "vandatdz"
 
-local FILE = "vandat_key.json"
+-- LINK
+local LINK = "https://your-link-here.com"
 
-local function getHWID()
-    if not isfile("hwid.txt") then
-        local id = tostring(math.random(1000,9999))
-        writefile("hwid.txt", id)
-        return id
-    end
-    return readfile("hwid.txt")
-end
-
-local HWID = getHWID()
-local VALID_KEY = "vandatdz-"..HWID
-
-local function saveKey()
-    local data = {key = VALID_KEY, time = os.time()}
-    writefile(FILE, HttpService:JSONEncode(data))
-end
-
-local function loadKey()
-    if not isfile(FILE) then return false end
-    local data = HttpService:JSONDecode(readfile(FILE))
-
-    if data.key ~= VALID_KEY then return false end
-
-    local diff = os.time() - data.time
-    if diff <= 86400 then
-        return true, 86400 - diff
-    else
-        delfile(FILE)
-        return false
-    end
-end
-
-local function formatTime(sec)
-    local h = math.floor(sec/3600)
-    local m = math.floor((sec%3600)/60)
-    local s = sec%60
-    return string.format("%02d:%02d:%02d", h,m,s)
-end
-
---================ MENU =================--
-
+-- SETTINGS
 local ESP = true
 local LINE = true
 
+--================ LOGIN UI =================--
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,260,0,180)
+frame.Position = UDim2.new(0.5,-130,0.5,-90)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", frame)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,40)
+title.Text = "Vandatdz"
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+
+local loginText = Instance.new("TextLabel", frame)
+loginText.Size = UDim2.new(1,0,0,20)
+loginText.Position = UDim2.new(0,0,0,40)
+loginText.Text = "Login"
+loginText.TextColor3 = Color3.new(1,1,1)
+loginText.BackgroundTransparency = 1
+
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.8,0,0,35)
+box.Position = UDim2.new(0.1,0,0.4,0)
+box.PlaceholderText = "Enter key..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.5,0,0,30)
+btn.Position = UDim2.new(0.25,0,0.75,0)
+btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
+
+--================ MENU =================--
+
 local function createMenu()
-    local gui = Instance.new("ScreenGui", game.CoreGui)
+    frame:Destroy()
 
     local main = Instance.new("Frame", gui)
     main.Size = UDim2.new(0,240,0,220)
@@ -64,7 +68,6 @@ local function createMenu()
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
     Instance.new("UICorner", main)
 
-    -- TITLE
     local title = Instance.new("TextLabel", main)
     title.Size = UDim2.new(1,0,0,30)
     title.Text = "Menu VandatdzESP"
@@ -72,7 +75,6 @@ local function createMenu()
     title.TextColor3 = Color3.fromRGB(0,255,255)
     title.Font = Enum.Font.GothamBold
 
-    -- CREDIT
     local credit = Instance.new("TextLabel", main)
     credit.Size = UDim2.new(1,0,0,20)
     credit.Position = UDim2.new(0,0,1,-20)
@@ -80,52 +82,24 @@ local function createMenu()
     credit.BackgroundTransparency = 1
     credit.TextColor3 = Color3.fromRGB(150,150,150)
 
-    -- KEY HIỂN THỊ
-    local keyLabel = Instance.new("TextLabel", main)
-    keyLabel.Size = UDim2.new(1,0,0,20)
-    keyLabel.Position = UDim2.new(0,0,0,30)
-    keyLabel.BackgroundTransparency = 1
-    keyLabel.TextColor3 = Color3.fromRGB(255,255,0)
-    keyLabel.Text = "Key: "..VALID_KEY
+    -- OPEN LINK BUTTON
+    local linkBtn = Instance.new("TextButton", main)
+    linkBtn.Size = UDim2.new(0.8,0,0,30)
+    linkBtn.Position = UDim2.new(0.1,0,0,40)
+    linkBtn.Text = "OPEN LINK"
+    linkBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    linkBtn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", linkBtn)
 
-    -- COPY KEY
-    local copyBtn = Instance.new("TextButton", main)
-    copyBtn.Size = UDim2.new(0.6,0,0,25)
-    copyBtn.Position = UDim2.new(0.2,0,0,55)
-    copyBtn.Text = "COPY KEY"
-    copyBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-    copyBtn.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", copyBtn)
-
-    copyBtn.MouseButton1Click:Connect(function()
+    linkBtn.MouseButton1Click:Connect(function()
         if setclipboard then
-            setclipboard(VALID_KEY)
-            copyBtn.Text = "Đã copy!"
+            setclipboard(LINK)
+            linkBtn.Text = "Đã copy link!"
             wait(1)
-            copyBtn.Text = "COPY KEY"
+            linkBtn.Text = "OPEN LINK"
         end
     end)
 
-    -- TIME
-    local timeText = Instance.new("TextLabel", main)
-    timeText.Size = UDim2.new(1,0,0,20)
-    timeText.Position = UDim2.new(0,0,0,85)
-    timeText.BackgroundTransparency = 1
-    timeText.TextColor3 = Color3.fromRGB(0,255,0)
-
-    spawn(function()
-        while true do
-            local valid, t = loadKey()
-            if not valid then
-                timeText.Text = "Key hết hạn!"
-                break
-            end
-            timeText.Text = "Time: "..formatTime(t)
-            wait(1)
-        end
-    end)
-
-    -- BUTTON
     local function button(name,y,state,callback)
         local b = Instance.new("TextButton", main)
         b.Size = UDim2.new(0.8,0,0,30)
@@ -142,10 +116,10 @@ local function createMenu()
         end)
     end
 
-    button("ESP",110,ESP,function(v) ESP=v end)
-    button("LINE",150,LINE,function(v) LINE=v end)
+    button("ESP",90,ESP,function(v) ESP=v end)
+    button("LINE",130,LINE,function(v) LINE=v end)
 
-    -- DRAG
+    -- DRAG MOBILE
     local drag, start, pos
     main.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.Touch then
@@ -181,9 +155,7 @@ local function esp(p)
     local bones = {
         {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
         {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},
-        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},
-        {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},
-        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"}
+        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"}
     }
 
     local skel = {}
@@ -236,7 +208,6 @@ local function esp(p)
                         end
                     end
                 end
-
             else
                 box.Visible = false
                 line.Visible = false
@@ -247,42 +218,15 @@ local function esp(p)
     end)
 end
 
---================ RUN =================--
+--================ LOGIN =================--
 
-local valid = loadKey()
-
-if valid then
-    createMenu()
-    for _,v in pairs(Players:GetPlayers()) do esp(v) end
-    Players.PlayerAdded:Connect(esp)
-else
-    local gui = Instance.new("ScreenGui", game.CoreGui)
-    local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0,260,0,160)
-    frame.Position = UDim2.new(0.5,-130,0.5,-80)
-    frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-    Instance.new("UICorner", frame)
-
-    local box = Instance.new("TextBox", frame)
-    box.Size = UDim2.new(0.8,0,0,35)
-    box.Position = UDim2.new(0.1,0,0.4,0)
-    box.PlaceholderText = "Nhập key..."
-
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(0.5,0,0,30)
-    btn.Position = UDim2.new(0.25,0,0.75,0)
-    btn.Text = "LOGIN"
-
-    btn.MouseButton1Click:Connect(function()
-        if box.Text == VALID_KEY then
-            saveKey()
-            frame:Destroy()
-            createMenu()
-            for _,v in pairs(Players:GetPlayers()) do esp(v) end
-            Players.PlayerAdded:Connect(esp)
-        else
-            box.Text = ""
-            box.PlaceholderText = "Sai key!"
-        end
-    end)
-end
+btn.MouseButton1Click:Connect(function()
+    if box.Text == KEY then
+        createMenu()
+        for _,v in pairs(Players:GetPlayers()) do esp(v) end
+        Players.PlayerAdded:Connect(esp)
+    else
+        box.Text = ""
+        box.PlaceholderText = "Sai key!"
+    end
+end)
