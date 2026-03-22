@@ -1,4 +1,4 @@
---// VANDATDZ ESP + AIM + MENU (WORKING)
+--// VANDATDZ FINAL FULL (ESP + AIM + MENU + LOGO)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -15,32 +15,43 @@ ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,200,0,150)
+Main.Size = UDim2.new(0,220,0,180)
 Main.Position = UDim2.new(0,100,0,200)
 Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
 
 Main.Active = true
 Main.Draggable = true
 
+-- LOGO
+local Logo = Instance.new("ImageLabel", Main)
+Logo.Size = UDim2.new(0,40,0,40)
+Logo.Position = UDim2.new(0,5,0,5)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://127839480332201"
+
 -- TITLE
 local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,30)
-Title.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Title.Size = UDim2.new(1,-50,0,30)
+Title.Position = UDim2.new(0,50,0,10)
+Title.BackgroundTransparency = 1
 Title.Text = "VANDATDZ MENU"
 Title.TextColor3 = Color3.fromRGB(0,170,255)
+Title.TextSize = 16
+Title.Font = Enum.Font.SourceSansBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- ESP BUTTON
 local ToggleESP = Instance.new("TextButton", Main)
-ToggleESP.Size = UDim2.new(1,-20,0,30)
-ToggleESP.Position = UDim2.new(0,10,0,40)
+ToggleESP.Size = UDim2.new(1,-20,0,35)
+ToggleESP.Position = UDim2.new(0,10,0,60)
 ToggleESP.Text = "ESP: ON"
 ToggleESP.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleESP.TextColor3 = Color3.fromRGB(255,255,255)
 
 -- AIM BUTTON
 local ToggleAim = Instance.new("TextButton", Main)
-ToggleAim.Size = UDim2.new(1,-20,0,30)
-ToggleAim.Position = UDim2.new(0,10,0,80)
+ToggleAim.Size = UDim2.new(1,-20,0,35)
+ToggleAim.Position = UDim2.new(0,10,0,105)
 ToggleAim.Text = "AIM: OFF"
 ToggleAim.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleAim.TextColor3 = Color3.fromRGB(255,255,255)
@@ -56,31 +67,46 @@ ToggleAim.MouseButton1Click:Connect(function()
 	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
 end)
 
--- ESP FUNCTION (Highlight + Name)
+-- ESP FUNCTION
 local function SetupESP(player)
 	if player == LocalPlayer then return end
 
-	player.CharacterAdded:Connect(function(char)
-		repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+	local function ApplyESP(char)
+		if not char then return end
 
-		-- Highlight (box)
-		local hl = Instance.new("Highlight", char)
+		local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart", 10)
+		if not hrp then return end
+
+		-- chống trùng
+		if char:FindFirstChild("VANDATDZ_ESP") then return end
+
+		local folder = Instance.new("Folder")
+		folder.Name = "VANDATDZ_ESP"
+		folder.Parent = char
+
+		-- BOX
+		local hl = Instance.new("Highlight")
 		hl.FillColor = Color3.fromRGB(255,0,0)
 		hl.OutlineColor = Color3.fromRGB(255,255,255)
+		hl.Parent = folder
 
-		-- Name + distance
-		local bill = Instance.new("BillboardGui", char)
-		bill.Size = UDim2.new(0,100,0,40)
+		-- NAME + DISTANCE
+		local bill = Instance.new("BillboardGui")
+		bill.Size = UDim2.new(0,120,0,40)
 		bill.AlwaysOnTop = true
-		bill.Adornee = char:WaitForChild("HumanoidRootPart")
+		bill.Adornee = hrp
+		bill.Parent = folder
 
-		local text = Instance.new("TextLabel", bill)
+		local text = Instance.new("TextLabel")
 		text.Size = UDim2.new(1,0,1,0)
 		text.BackgroundTransparency = 1
 		text.TextColor3 = Color3.new(1,1,1)
 		text.TextScaled = true
+		text.Parent = bill
 
 		RunService.RenderStepped:Connect(function()
+			if not char or not char.Parent then return end
+
 			if not ESP_ENABLED then
 				hl.Enabled = false
 				bill.Enabled = false
@@ -91,15 +117,27 @@ local function SetupESP(player)
 			bill.Enabled = true
 
 			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-				local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude)
+				local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
 				text.Text = player.Name.." ["..dist.."m]"
 			end
+		end)
+	end
+
+	-- FIX FULL (player cũ + mới)
+	task.spawn(function()
+		if player.Character then
+			ApplyESP(player.Character)
+		end
+
+		player.CharacterAdded:Connect(function(char)
+			task.wait(0.5)
+			ApplyESP(char)
 		end)
 	end)
 end
 
--- APPLY ESP
-for _,v in pairs(Players:GetPlayers()) do
+-- LOAD ESP
+for _,v in ipairs(Players:GetPlayers()) do
 	SetupESP(v)
 end
 
@@ -122,7 +160,7 @@ local function GetClosest()
 	return closest
 end
 
--- AIM
+-- AIMLOOK
 RunService.RenderStepped:Connect(function()
 	if AIM_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
 		local target = GetClosest()
