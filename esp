@@ -1,6 +1,4 @@
---// VANDATDZ FULL PRO FINAL (FULL FIX)
-
-repeat wait() until game:IsLoaded()
+--// VANDATDZ FULL PRO FINAL (ALL IN ONE)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -12,6 +10,7 @@ local Camera = workspace.CurrentCamera
 local ESP_ENABLED = true
 local AIM_ENABLED = false
 local HITBOX_ENABLED = false
+local LOGO_ENABLED = true
 
 local HITBOX_SIZE = 5
 
@@ -20,329 +19,47 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- MAIN MENU
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0,230,0,300)
 Main.Position = UDim2.new(0,100,0,200)
 Main.BackgroundColor3 = Color3.fromRGB(15,15,15)
 Main.Active = true
 Main.Draggable = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
 
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
 local stroke = Instance.new("UIStroke", Main)
 stroke.Color = Color3.fromRGB(0,170,255)
 
--- 🔥 LOGO
-local Logo = Instance.new("ImageLabel", ScreenGui)
-Logo.Size = UDim2.new(0,60,0,60)
-Logo.Position = UDim2.new(0,20,0,200)
-Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
+-- ✅ LOGO FLOATING (FIX CHUẨN)
+local Logo = Instance.new("ImageButton", ScreenGui)
+Logo.Size = UDim2.new(0,50,0,50)
+Logo.Position = UDim2.new(0,50,0,200)
+Logo.BackgroundTransparency = 1
 Logo.Image = "rbxassetid://127839480332201"
 Logo.Active = true
-Instance.new("UICorner", Logo).CornerRadius = UDim.new(1,0)
 
-local stroke2 = Instance.new("UIStroke", Logo)
-stroke2.Color = Color3.fromRGB(0,170,255)
-stroke2.Thickness = 2
-
--- CLICK
-local Click = Instance.new("TextButton", Logo)
-Click.Size = UDim2.new(1,0,1,0)
-Click.BackgroundTransparency = 1
-Click.Text = ""
-
-Click.MouseButton1Click:Connect(function()
-	Main.Visible = not Main.Visible
-end)
-
--- 🔥 DRAG LOGO (FIX PC + MOBILE)
-local dragging = false
+-- ✅ DRAG + CLICK FIX
+local draggingLogo = false
 local dragStart, startPos
+local moved = false
 
 Logo.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 
-	or input.UserInputType == Enum.UserInputType.Touch then
-		
-		dragging = true
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingLogo = true
 		dragStart = input.Position
 		startPos = Logo.Position
-
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
+		moved = false
 	end
 end)
 
 Logo.InputChanged:Connect(function(input)
-	if dragging then
+	if draggingLogo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 		local delta = input.Position - dragStart
-		local newPos = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
 
-		-- clamp màn hình
-		local camSize = workspace.CurrentCamera.ViewportSize
-		local x = math.clamp(newPos.X.Offset, 0, camSize.X - Logo.AbsoluteSize.X)
-		local y = math.clamp(newPos.Y.Offset, 0, camSize.Y - Logo.AbsoluteSize.Y)
-
-		Logo.Position = UDim2.new(0,x,0,y)
-	end
-end)
-
--- TITLE
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,40)
-Title.BackgroundTransparency = 1
-Title.Text = "VANDATDZ HUB"
-Title.TextColor3 = Color3.fromRGB(0,170,255)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-
--- BUTTON
-local function Btn(text,y)
-	local b = Instance.new("TextButton", Main)
-	b.Size = UDim2.new(1,-20,0,32)
-	b.Position = UDim2.new(0,10,0,y)
-	b.Text = text
-	b.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	b.TextColor3 = Color3.fromRGB(255,255,255)
-	b.Font = Enum.Font.GothamBold
-	b.TextSize = 14
-	Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
-	return b
-end
-
-local ToggleESP = Btn("ESP: ON",60)
-local ToggleAim = Btn("AIM: OFF",100)
-local ToggleHitbox = Btn("HITBOX: OFF",140)
-local SizeUp = Btn("SIZE +",180)
-local SizeDown = Btn("SIZE -",220)
-
--- TOGGLES
-ToggleESP.MouseButton1Click:Connect(function()
-	ESP_ENABLED = not ESP_ENABLED
-	ToggleESP.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
-end)
-
-ToggleAim.MouseButton1Click:Connect(function()
-	AIM_ENABLED = not AIM_ENABLED
-	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
-end)
-
-ToggleHitbox.MouseButton1Click:Connect(function()
-	HITBOX_ENABLED = not HITBOX_ENABLED
-	ToggleHitbox.Text = "HITBOX: "..(HITBOX_ENABLED and "ON" or "OFF")
-end)
-
-SizeUp.MouseButton1Click:Connect(function()
-	HITBOX_SIZE += 1
-end)
-
-SizeDown.MouseButton1Click:Connect(function()
-	HITBOX_SIZE = math.max(2, HITBOX_SIZE - 1)
-end)
-
--- HITBOX (NHẸ LAG HƠN)
-local function ApplyHitbox(char)
-	for _,p in pairs(char:GetChildren()) do
-		if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
-			
-			if not p:FindFirstChild("OriginalSize") then
-				local v = Instance.new("Vector3Value", p)
-				v.Name = "OriginalSize"
-				v.Value = p.Size
-			end
-
-			if HITBOX_ENABLED then
-				p.Size = Vector3.new(HITBOX_SIZE,HITBOX_SIZE,HITBOX_SIZE)
-				p.Transparency = 0.5
-				p.Color = Color3.fromRGB(255,0,0)
-				p.Material = Enum.Material.Neon
-				p.CanCollide = false
-			else
-				local o = p:FindFirstChild("OriginalSize")
-				if o then p.Size = o.Value end
-				p.Transparency = 0
-				p.Material = Enum.Material.Plastic
-			end
+		if math.abs(delta.X) > 3 or math.abs(delta.Y) > 3 then
+			moved = true
 		end
-	end
-end
 
--- ESP
-local function SetupESP(player)
-	if player == LocalPlayer then return end
-
-	local function Apply(char)
-		local hrp = char:WaitForChild("HumanoidRootPart",10)
-		if not hrp then return end
-
-		if char:FindFirstChild("ESP") then return end
-
-		local f = Instance.new("Folder", char)
-		f.Name = "ESP"
-
-		local hl = Instance.new("Highlight", f)
-
-		local bill = Instance.new("BillboardGui", f)
-		bill.Size = UDim2.new(0,120,0,40)
-		bill.AlwaysOnTop = true
-		bill.Adornee = hrp
-
-		local txt = Instance.new("TextLabel", bill)
-		txt.Size = UDim2.new(1,0,1,0)
-		txt.BackgroundTransparency = 1
-		txt.TextScaled = true
-		txt.Font = Enum.Font.GothamBold
-
-		RunService.RenderStepped:Connect(function()
-			if not char or not char.Parent then return end
-
-			if ESP_ENABLED then
-				hl.Enabled = true
-				bill.Enabled = true
-
-				local isTeam = player.Team == LocalPlayer.Team
-				local color = isTeam and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-
-				hl.FillColor = color
-				txt.TextColor3 = color
-
-				if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-					local d = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
-					txt.Text = player.Name.." ["..d.."m]"
-				end
-			else
-				hl.Enabled = false
-				bill.Enabled = false
-			end
-
-			ApplyHitbox(char)
-		end)
-	end
-
-	if player.Character then Apply(player.Character) end
-	player.CharacterAdded:Connect(function(c)
-		task.wait(0.5)
-		Apply(c)
-	end)
-end
-
-for _,v in ipairs(Players:GetPlayers()) do
-	SetupESP(v)
-end
-
-Players.PlayerAdded:Connect(SetupESP)
-
--- AIM
-local function GetClosest()
-	local c,d=nil,math.huge
-	for _,v in pairs(Players:GetPlayers()) do
-		if v~=LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-			local m=(LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
-			if m<d then d=m c=v end
-		end
-	end
-	return c
-end
-
-RunService.RenderStepped:Connect(function()
-	if AIM_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local t=GetClosest()
-		if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
-			Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Character.HumanoidRootPart.Position)
-		end
-	end
-end)                        if input == dragInput and dragging then
-                            local delta = input.Position - dragStart
-                            obj.Position = UDim2.new(
-                                startPos.X.Scale,
-                                startPos.X.Offset + delta.X,
-                                startPos.Y.Scale,
-                                startPos.Y.Offset + delta.Y
-                            )
-                        end
-                    end)
-
-                end
-            end
-        end
-    end
-
-    -- 🔥 FIX ESP (loop luôn chạy)
-    while true do
-        task.wait(1)
-
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer and plr.Character then
-
-                local char = plr.Character
-                local hl = char:FindFirstChild("Highlight")
-
-                if not hl then
-                    hl = Instance.new("Highlight")
-                    hl.FillColor = Color3.fromRGB(255,0,0)
-                    hl.OutlineColor = Color3.fromRGB(255,255,255)
-                    hl.Parent = char
-                end
-
-                hl.Enabled = true -- luôn bật để test
-            end
-        end
-    end
-end)Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
-Logo.Image = "rbxassetid://127839480332201"
-Logo.Active = true
-
-Instance.new("UICorner", Logo).CornerRadius = UDim.new(1,0)
-
-local stroke2 = Instance.new("UIStroke", Logo)
-stroke2.Color = Color3.fromRGB(0,170,255)
-stroke2.Thickness = 2
-
--- CLICK LAYER
-local Click = Instance.new("TextButton", Logo)
-Click.Size = UDim2.new(1,0,1,0)
-Click.BackgroundTransparency = 1
-Click.Text = ""
-
--- TOGGLE MENU
-Click.MouseButton1Click:Connect(function()
-	Main.Visible = not Main.Visible
-end)
-
--- 🔥 DRAG FIX (DÙNG CLICK)
-local dragging = false
-local dragInput, dragStart, startPos
-
-Click.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = Logo.Position
-
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
-end)
-
-Click.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		local delta = input.Position - dragStart
 		Logo.Position = UDim2.new(
 			startPos.X.Scale,
 			startPos.X.Offset + delta.X,
@@ -352,14 +69,26 @@ UIS.InputChanged:Connect(function(input)
 	end
 end)
 
+Logo.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		draggingLogo = false
+
+		if not moved then
+			Main.Visible = not Main.Visible
+		end
+	end
+end)
+
 -- TITLE
 local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,40)
+Title.Size = UDim2.new(1,-60,0,30)
+Title.Position = UDim2.new(0,60,0,15)
 Title.BackgroundTransparency = 1
 Title.Text = "VANDATDZ HUB"
 Title.TextColor3 = Color3.fromRGB(0,170,255)
-Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- BUTTON
 local function Btn(text,y)
@@ -375,11 +104,19 @@ local function Btn(text,y)
 	return b
 end
 
-local ToggleESP = Btn("ESP: ON",60)
-local ToggleAim = Btn("AIM: OFF",100)
-local ToggleHitbox = Btn("HITBOX: OFF",140)
-local SizeUp = Btn("SIZE +",180)
-local SizeDown = Btn("SIZE -",220)
+local ToggleESP = Btn("ESP: ON",70)
+local ToggleAim = Btn("AIM: OFF",105)
+local ToggleLogo = Btn("LOGO: ON",140)
+local ToggleHitbox = Btn("HITBOX: OFF",175)
+local SizeUp = Btn("SIZE +",210)
+local SizeDown = Btn("SIZE -",245)
+
+-- MENU TOGGLE
+UIS.InputBegan:Connect(function(i)
+	if i.KeyCode == Enum.KeyCode.RightShift then
+		Main.Visible = not Main.Visible
+	end
+end)
 
 -- TOGGLES
 ToggleESP.MouseButton1Click:Connect(function()
@@ -390,6 +127,12 @@ end)
 ToggleAim.MouseButton1Click:Connect(function()
 	AIM_ENABLED = not AIM_ENABLED
 	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
+end)
+
+ToggleLogo.MouseButton1Click:Connect(function()
+	LOGO_ENABLED = not LOGO_ENABLED
+	Logo.Visible = LOGO_ENABLED
+	ToggleLogo.Text = "LOGO: "..(LOGO_ENABLED and "ON" or "OFF")
 end)
 
 ToggleHitbox.MouseButton1Click:Connect(function()
@@ -405,7 +148,7 @@ SizeDown.MouseButton1Click:Connect(function()
 	HITBOX_SIZE = math.max(2, HITBOX_SIZE - 1)
 end)
 
--- HITBOX FULL BODY
+-- HITBOX
 local function ApplyHitbox(char)
 	for _,p in pairs(char:GetChildren()) do
 		if p:IsA("BasePart") then
