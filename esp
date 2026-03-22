@@ -1,40 +1,77 @@
---// VANDATDZ FULL PRO FINAL (ROUND LOGO DRAG FIX)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/esp"))()
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
+-- FIX DRAG + FIX ESP
+task.spawn(function()
+    local UIS = game:GetService("UserInputService")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
 
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+    -- 🔥 DRAG ALL GUI (logo + menu)
+    for _, gui in pairs(game:GetService("CoreGui"):GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            for _, obj in pairs(gui:GetDescendants()) do
+                if obj:IsA("Frame") or obj:IsA("TextButton") then
 
-local ESP_ENABLED = true
-local AIM_ENABLED = false
-local HITBOX_ENABLED = false
+                    local dragging, dragInput, dragStart, startPos
 
-local HITBOX_SIZE = 5
+                    obj.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 
+                        or input.UserInputType == Enum.UserInputType.Touch then
+                            dragging = true
+                            dragStart = input.Position
+                            startPos = obj.Position
 
--- GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
+                            input.Changed:Connect(function()
+                                if input.UserInputState == Enum.UserInputState.End then
+                                    dragging = false
+                                end
+                            end)
+                        end
+                    end)
 
--- MAIN MENU
-local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,230,0,300)
-Main.Position = UDim2.new(0,100,0,200)
-Main.BackgroundColor3 = Color3.fromRGB(15,15,15)
-Main.Active = true
-Main.Draggable = true
+                    obj.InputChanged:Connect(function(input)
+                        dragInput = input
+                    end)
 
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
-local stroke = Instance.new("UIStroke", Main)
-stroke.Color = Color3.fromRGB(0,170,255)
+                    UIS.InputChanged:Connect(function(input)
+                        if input == dragInput and dragging then
+                            local delta = input.Position - dragStart
+                            obj.Position = UDim2.new(
+                                startPos.X.Scale,
+                                startPos.X.Offset + delta.X,
+                                startPos.Y.Scale,
+                                startPos.Y.Offset + delta.Y
+                            )
+                        end
+                    end)
 
--- 🔥 LOGO TRÒN
-local Logo = Instance.new("ImageLabel", ScreenGui)
-Logo.Size = UDim2.new(0,60,0,60)
-Logo.Position = UDim2.new(0,20,0,200)
-Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
+                end
+            end
+        end
+    end
+
+    -- 🔥 FIX ESP (loop luôn chạy)
+    while true do
+        task.wait(1)
+
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character then
+
+                local char = plr.Character
+                local hl = char:FindFirstChild("Highlight")
+
+                if not hl then
+                    hl = Instance.new("Highlight")
+                    hl.FillColor = Color3.fromRGB(255,0,0)
+                    hl.OutlineColor = Color3.fromRGB(255,255,255)
+                    hl.Parent = char
+                end
+
+                hl.Enabled = true -- luôn bật để test
+            end
+        end
+    end
+end)Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Logo.Image = "rbxassetid://127839480332201"
 Logo.Active = true
 
