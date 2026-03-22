@@ -1,96 +1,49 @@
---// VANDATDZ FULL (ESP + AIMLOOK + DRAG + LOGO)
+--// VANDATDZ ESP + AIM + MENU (WORKING)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
 local ESP_ENABLED = true
-local AIMLOOK_ENABLED = false
+local AIM_ENABLED = false
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Name = "VANDATDZ_GUI"
 
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0,220,0,180)
+Main.Size = UDim2.new(0,200,0,150)
 Main.Position = UDim2.new(0,100,0,200)
 Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
-Main.BorderSizePixel = 0
 
--- LOGO
-local Logo = Instance.new("ImageLabel", Main)
-Logo.Size = UDim2.new(0,40,0,40)
-Logo.Position = UDim2.new(0,5,0,5)
-Logo.BackgroundTransparency = 1
-Logo.Image = "rbxassetid://127839480332201" -- logo bạn
+Main.Active = true
+Main.Draggable = true
 
 -- TITLE
 local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,-50,0,30)
-Title.Position = UDim2.new(0,50,0,10)
-Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1,0,0,30)
+Title.BackgroundColor3 = Color3.fromRGB(0,0,0)
 Title.Text = "VANDATDZ MENU"
 Title.TextColor3 = Color3.fromRGB(0,170,255)
-Title.TextSize = 16
-Title.Font = Enum.Font.SourceSansBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- ESP BUTTON
 local ToggleESP = Instance.new("TextButton", Main)
-ToggleESP.Size = UDim2.new(1,-20,0,35)
-ToggleESP.Position = UDim2.new(0,10,0,60)
+ToggleESP.Size = UDim2.new(1,-20,0,30)
+ToggleESP.Position = UDim2.new(0,10,0,40)
 ToggleESP.Text = "ESP: ON"
 ToggleESP.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleESP.TextColor3 = Color3.fromRGB(255,255,255)
 
 -- AIM BUTTON
 local ToggleAim = Instance.new("TextButton", Main)
-ToggleAim.Size = UDim2.new(1,-20,0,35)
-ToggleAim.Position = UDim2.new(0,10,0,105)
+ToggleAim.Size = UDim2.new(1,-20,0,30)
+ToggleAim.Position = UDim2.new(0,10,0,80)
 ToggleAim.Text = "AIM: OFF"
 ToggleAim.BackgroundColor3 = Color3.fromRGB(40,40,40)
 ToggleAim.TextColor3 = Color3.fromRGB(255,255,255)
-
--- DRAG (CHUẨN 100%)
-local dragging = false
-local dragInput, dragStart, startPos
-
-Main.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = Main.Position
-
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
-end)
-
-Main.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-		dragInput = input
-	end
-end)
-
-UIS.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		local delta = input.Position - dragStart
-		Main.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
-end)
 
 -- TOGGLE
 ToggleESP.MouseButton1Click:Connect(function()
@@ -99,12 +52,61 @@ ToggleESP.MouseButton1Click:Connect(function()
 end)
 
 ToggleAim.MouseButton1Click:Connect(function()
-	AIMLOOK_ENABLED = not AIMLOOK_ENABLED
-	ToggleAim.Text = "AIM: "..(AIMLOOK_ENABLED and "ON" or "OFF")
+	AIM_ENABLED = not AIM_ENABLED
+	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
 end)
 
--- GET CLOSEST PLAYER
-local function GetClosestPlayer()
+-- ESP FUNCTION (Highlight + Name)
+local function SetupESP(player)
+	if player == LocalPlayer then return end
+
+	player.CharacterAdded:Connect(function(char)
+		repeat task.wait() until char:FindFirstChild("HumanoidRootPart")
+
+		-- Highlight (box)
+		local hl = Instance.new("Highlight", char)
+		hl.FillColor = Color3.fromRGB(255,0,0)
+		hl.OutlineColor = Color3.fromRGB(255,255,255)
+
+		-- Name + distance
+		local bill = Instance.new("BillboardGui", char)
+		bill.Size = UDim2.new(0,100,0,40)
+		bill.AlwaysOnTop = true
+		bill.Adornee = char:WaitForChild("HumanoidRootPart")
+
+		local text = Instance.new("TextLabel", bill)
+		text.Size = UDim2.new(1,0,1,0)
+		text.BackgroundTransparency = 1
+		text.TextColor3 = Color3.new(1,1,1)
+		text.TextScaled = true
+
+		RunService.RenderStepped:Connect(function()
+			if not ESP_ENABLED then
+				hl.Enabled = false
+				bill.Enabled = false
+				return
+			end
+
+			hl.Enabled = true
+			bill.Enabled = true
+
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude)
+				text.Text = player.Name.." ["..dist.."m]"
+			end
+		end)
+	end)
+end
+
+-- APPLY ESP
+for _,v in pairs(Players:GetPlayers()) do
+	SetupESP(v)
+end
+
+Players.PlayerAdded:Connect(SetupESP)
+
+-- GET CLOSEST
+local function GetClosest()
 	local closest, dist = nil, math.huge
 
 	for _,v in pairs(Players:GetPlayers()) do
@@ -120,78 +122,12 @@ local function GetClosestPlayer()
 	return closest
 end
 
--- AIMLOOK
+-- AIM
 RunService.RenderStepped:Connect(function()
-	if AIMLOOK_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local target = GetClosestPlayer()
+	if AIM_ENABLED and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local target = GetClosest()
 		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
 			Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.HumanoidRootPart.Position)
 		end
 	end
 end)
-
--- ESP
-local function CreateESP(player)
-	if player == LocalPlayer then return end
-
-	local Box = Drawing.new("Square")
-	Box.Color = Color3.fromRGB(255,0,0)
-	Box.Thickness = 2
-	Box.Filled = false
-
-	local Line = Drawing.new("Line")
-	Line.Color = Color3.fromRGB(0,255,0)
-	Line.Thickness = 1
-
-	local Text = Drawing.new("Text")
-	Text.Size = 13
-	Text.Color = Color3.fromRGB(255,255,255)
-	Text.Center = true
-	Text.Outline = true
-
-	RunService.RenderStepped:Connect(function()
-		if not ESP_ENABLED then
-			Box.Visible = false
-			Line.Visible = false
-			Text.Visible = false
-			return
-		end
-
-		local char = player.Character
-		if char and char:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character then
-			local hrp = char.HumanoidRootPart
-			local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
-
-			if onScreen then
-				local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
-
-				Box.Size = Vector2.new(50,80)
-				Box.Position = Vector2.new(pos.X - 25, pos.Y - 40)
-				Box.Visible = true
-
-				Line.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
-				Line.To = Vector2.new(pos.X, pos.Y)
-				Line.Visible = true
-
-				Text.Position = Vector2.new(pos.X, pos.Y - 50)
-				Text.Text = player.Name.." ["..dist.."m]"
-				Text.Visible = true
-			else
-				Box.Visible = false
-				Line.Visible = false
-				Text.Visible = false
-			end
-		else
-			Box.Visible = false
-			Line.Visible = false
-			Text.Visible = false
-		end
-	end)
-end
-
--- LOAD
-for _,v in pairs(Players:GetPlayers()) do
-	CreateESP(v)
-end
-
-Players.PlayerAdded:Connect(CreateESP)
