@@ -1,4 +1,4 @@
---// VANDATDZ ESP FINAL + PNG LOGO
+--// VANDATDZ ESP FINAL (LOGO TOGGLE MENU)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -165,7 +165,7 @@ local function createMenu()
         end
     end)
 
-    --================ LOGO PNG =================--
+    --================ LOGO PNG TOGGLE MENU =================--
 
     local logo = Instance.new("ImageButton", gui)
     logo.Size = UDim2.new(0,65,0,65)
@@ -175,21 +175,13 @@ local function createMenu()
 
     local stroke = Instance.new("UIStroke", logo)
     stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(0,255,255)
 
-    local function updateLogo()
-        if ESP then
-            stroke.Color = Color3.fromRGB(0,255,150)
-            logo.ImageColor3 = Color3.fromRGB(255,255,255)
-        else
-            stroke.Color = Color3.fromRGB(255,80,80)
-            logo.ImageColor3 = Color3.fromRGB(150,150,150)
-        end
-    end
-    updateLogo()
+    local menuOpen = true
 
     logo.MouseButton1Click:Connect(function()
-        ESP = not ESP
-        updateLogo()
+        menuOpen = not menuOpen
+        main.Visible = menuOpen
     end)
 
     -- DRAG LOGO
