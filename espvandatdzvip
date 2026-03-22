@@ -1,4 +1,4 @@
---// VANDATDZ LOGIN ESP FULL FINAL
+--// VANDATDZ ESP FINAL + PNG LOGO
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -17,7 +17,7 @@ local LINK = "https://your-link-here.com"
 local ESP = true
 local LINE = true
 
--- SAVE KEY 24H
+-- SAVE KEY
 local SAVE_FILE = "vandat_key.txt"
 local EXPIRE = 86400
 
@@ -73,7 +73,6 @@ box.BackgroundColor3 = Color3.fromRGB(40,40,40)
 box.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", box)
 
--- LOGIN BUTTON
 local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0.4,0,0,30)
 btn.Position = UDim2.new(0.1,0,0.75,0)
@@ -82,7 +81,6 @@ btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
 btn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", btn)
 
--- OPEN LINK BUTTON
 local linkBtn = Instance.new("TextButton", frame)
 linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
@@ -94,7 +92,7 @@ Instance.new("UICorner", linkBtn)
 linkBtn.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(LINK)
-        linkBtn.Text = "Đã copy!"
+        linkBtn.Text = "Copied!"
         wait(1)
         linkBtn.Text = "OPEN LINK"
     end
@@ -144,7 +142,7 @@ local function createMenu()
     button("ESP",60,ESP,function(v) ESP=v end)
     button("LINE",100,LINE,function(v) LINE=v end)
 
-    -- DRAG
+    -- DRAG MENU
     local drag, start, pos
     main.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.Touch then
@@ -166,6 +164,62 @@ local function createMenu()
             drag = false
         end
     end)
+
+    --================ LOGO PNG =================--
+
+    local logo = Instance.new("ImageButton", gui)
+    logo.Size = UDim2.new(0,65,0,65)
+    logo.Position = UDim2.new(1,-80,0,120)
+    logo.Image = "https://i.imgur.com/8QZ7Z9B.png"
+    logo.BackgroundTransparency = 1
+
+    local stroke = Instance.new("UIStroke", logo)
+    stroke.Thickness = 2
+
+    local function updateLogo()
+        if ESP then
+            stroke.Color = Color3.fromRGB(0,255,150)
+            logo.ImageColor3 = Color3.fromRGB(255,255,255)
+        else
+            stroke.Color = Color3.fromRGB(255,80,80)
+            logo.ImageColor3 = Color3.fromRGB(150,150,150)
+        end
+    end
+    updateLogo()
+
+    logo.MouseButton1Click:Connect(function()
+        ESP = not ESP
+        updateLogo()
+    end)
+
+    -- DRAG LOGO
+    local dragging, startPos, startInput
+
+    logo.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            startInput = input.Position
+            startPos = logo.Position
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - startInput
+            logo.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 end
 
 --================ ESP =================--
@@ -182,18 +236,23 @@ local function esp(p)
     text.Color = Color3.fromRGB(255,255,255)
 
     local bones = {
-        {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
+        {"Head","UpperTorso"},{"Head","Torso"},
+        {"UpperTorso","LowerTorso"},{"Torso","HumanoidRootPart"},
         {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+        {"Torso","Left Arm"},
         {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
+        {"Torso","Right Arm"},
         {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
-        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"}
+        {"Torso","Left Leg"},
+        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
+        {"Torso","Right Leg"}
     }
 
     local skel = {}
     for i=1,#bones do
         local l = Drawing.new("Line")
         l.Color = Color3.fromRGB(255,255,255)
-        l.Thickness = 2.5
+        l.Thickness = 3
         table.insert(skel,l)
     end
 
@@ -223,15 +282,14 @@ local function esp(p)
                     line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
                     line.To = Vector2.new(pos.X,pos.Y)
                     line.Color = Color3.fromRGB(0,255,0)
-                    line.Thickness = 1.5
                     line.Visible = true
                 else
                     line.Visible = false
                 end
 
                 for i,b in ipairs(bones) do
-                    local p1 = c:FindFirstChild(b[1])
-                    local p2 = c:FindFirstChild(b[2])
+                    local p1 = c:FindFirstChild(b[1], true)
+                    local p2 = c:FindFirstChild(b[2], true)
 
                     if p1 and p2 then
                         local a,v1 = Camera:WorldToViewportPoint(p1.Position)
@@ -257,7 +315,7 @@ local function esp(p)
     end)
 end
 
---================ LOGIN =================--
+--================ START =================--
 
 local function startESP()
     createMenu()
