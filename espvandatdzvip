@@ -38,6 +38,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
+-- LOGIN FRAME
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0,300,0,220)
 Frame.Position = UDim2.new(0.5,-150,0.5,-110)
@@ -64,7 +65,6 @@ Button.Text = "LOGIN"
 Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
 Button.TextColor3 = Color3.new(1,1,1)
 
--- GET KEY
 local GetKey = Instance.new("TextButton", Frame)
 GetKey.Size = UDim2.new(0.8,0,0,30)
 GetKey.Position = UDim2.new(0.1,0,0.75,0)
@@ -78,59 +78,100 @@ Status.Position = UDim2.new(0,0,1,-20)
 Status.BackgroundTransparency = 1
 Status.TextColor3 = Color3.fromRGB(255,0,0)
 
--- 🔥 NÚT MỞ MENU
+-- MENU ESP
+local HackFrame = Instance.new("Frame", ScreenGui)
+HackFrame.Size = UDim2.new(0,240,0,200)
+HackFrame.Position = UDim2.new(0.5,-120,0.5,-100)
+HackFrame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+HackFrame.Visible = false
+
+local Title2 = Instance.new("TextLabel", HackFrame)
+Title2.Size = UDim2.new(1,0,0,40)
+Title2.Text = "VANDATDZ ESP"
+Title2.TextColor3 = Color3.new(1,1,1)
+Title2.BackgroundTransparency = 1
+Title2.TextScaled = true
+
+local ESPBtn = Instance.new("TextButton", HackFrame)
+ESPBtn.Size = UDim2.new(0.8,0,0,35)
+ESPBtn.Position = UDim2.new(0.1,0,0.35,0)
+ESPBtn.Text = "ESP: OFF"
+ESPBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+ESPBtn.TextColor3 = Color3.new(1,1,1)
+
+local NameBtn = Instance.new("TextButton", HackFrame)
+NameBtn.Size = UDim2.new(0.8,0,0,35)
+NameBtn.Position = UDim2.new(0.1,0,0.6,0)
+NameBtn.Text = "NAME: ON"
+NameBtn.BackgroundColor3 = Color3.fromRGB(100,200,255)
+NameBtn.TextColor3 = Color3.new(1,1,1)
+
+_G.ESP_ENABLED = false
+_G.NAME_ENABLED = true
+
+ESPBtn.MouseButton1Click:Connect(function()
+    _G.ESP_ENABLED = not _G.ESP_ENABLED
+    ESPBtn.Text = "ESP: " .. (_G.ESP_ENABLED and "ON" or "OFF")
+end)
+
+NameBtn.MouseButton1Click:Connect(function()
+    _G.NAME_ENABLED = not _G.NAME_ENABLED
+    NameBtn.Text = "NAME: " .. (_G.NAME_ENABLED and "ON" or "OFF")
+end)
+
+-- OPEN MENU BUTTON
 local OpenBtn = Instance.new("TextButton", ScreenGui)
 OpenBtn.Size = UDim2.new(0,120,0,40)
 OpenBtn.Position = UDim2.new(0,20,0,200)
 OpenBtn.Text = "VANDATDZ"
 OpenBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-OpenBtn.TextColor3 = Color3.new(1,1,1)
 
 OpenBtn.MouseButton1Click:Connect(function()
-    Frame.Visible = not Frame.Visible
+    HackFrame.Visible = not HackFrame.Visible
 end)
 
--- DRAG
-local dragging, dragInput, dragStart, startPos
+-- DRAG (LOGIN + MENU)
+local function makeDraggable(obj)
+    local dragging, dragInput, dragStart, startPos
 
-local function update(input)
-    local delta = input.Position - dragStart
-    Frame.Position = UDim2.new(
-        startPos.X.Scale,
-        startPos.X.Offset + delta.X,
-        startPos.Y.Scale,
-        startPos.Y.Offset + delta.Y
-    )
+    local function update(input)
+        local delta = input.Position - dragStart
+        obj.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    obj.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = obj.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    obj.InputChanged:Connect(function(input)
+        dragInput = input
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
 end
 
-Frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 
-    or input.UserInputType == Enum.UserInputType.Touch then
-
-        dragging = true
-        dragStart = input.Position
-        startPos = Frame.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-Frame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement 
-    or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        update(input)
-    end
-end)
+makeDraggable(Frame)
+makeDraggable(HackFrame)
 
 -- LOGIN
 local function successLogin()
@@ -143,7 +184,8 @@ local function successLogin()
     })
 
     wait(1)
-    Frame.Visible = false -- 🔥 không xoá nữa
+    Frame.Visible = false
+    HackFrame.Visible = true
 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/main/esp.lua"))()
 end
@@ -160,7 +202,6 @@ Button.MouseButton1Click:Connect(function()
     doLogin(Box.Text)
 end)
 
--- GET KEY CLICK
 GetKey.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(GET_KEY_LINK)
