@@ -1,4 +1,4 @@
---// LOGIN SYSTEM VANDATDZ (DRAG + 24H KEY)
+--// LOGIN SYSTEM VANDATDZ (FULL)
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -9,18 +9,23 @@ local FILE = "vandatdz_key.txt"
 
 -- KEY SETTINGS
 local VALID_KEY = "vandatdz"
-local KEY_DURATION = 24 * 60 * 60 -- 24h (giây)
+local KEY_DURATION = 24 * 60 * 60 -- 24h
+
+-- LINK GET KEY
+local GET_KEY_LINK = "https://your-link.com" -- 👉 đổi link tại đây
 
 -- SAVE / LOAD
+local HttpService = game:GetService("HttpService")
+
 local function saveData(data)
     if writefile then
-        writefile(FILE, game:GetService("HttpService"):JSONEncode(data))
+        writefile(FILE, HttpService:JSONEncode(data))
     end
 end
 
 local function loadData()
     if readfile and isfile and isfile(FILE) then
-        return game:GetService("HttpService"):JSONDecode(readfile(FILE))
+        return HttpService:JSONDecode(readfile(FILE))
     end
     return nil
 end
@@ -29,8 +34,8 @@ end
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 
 local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0,300,0,180)
-Frame.Position = UDim2.new(0.5,-150,0.5,-90)
+Frame.Size = UDim2.new(0,300,0,220)
+Frame.Position = UDim2.new(0.5,-150,0.5,-110)
 Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
 
 local Title = Instance.new("TextLabel", Frame)
@@ -42,17 +47,25 @@ Title.TextScaled = true
 
 local Box = Instance.new("TextBox", Frame)
 Box.Size = UDim2.new(0.8,0,0,35)
-Box.Position = UDim2.new(0.1,0,0.4,0)
+Box.Position = UDim2.new(0.1,0,0.3,0)
 Box.PlaceholderText = "Enter Key..."
 Box.BackgroundColor3 = Color3.fromRGB(30,30,30)
 Box.TextColor3 = Color3.new(1,1,1)
 
 local Button = Instance.new("TextButton", Frame)
 Button.Size = UDim2.new(0.8,0,0,35)
-Button.Position = UDim2.new(0.1,0,0.7,0)
+Button.Position = UDim2.new(0.1,0,0.55,0)
 Button.Text = "LOGIN"
 Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
 Button.TextColor3 = Color3.new(1,1,1)
+
+-- 🔥 NÚT GET KEY
+local GetKey = Instance.new("TextButton", Frame)
+GetKey.Size = UDim2.new(0.8,0,0,30)
+GetKey.Position = UDim2.new(0.1,0,0.75,0)
+GetKey.Text = "GET KEY"
+GetKey.BackgroundColor3 = Color3.fromRGB(50,50,50)
+GetKey.TextColor3 = Color3.new(1,1,1)
 
 local Status = Instance.new("TextLabel", Frame)
 Status.Size = UDim2.new(1,0,0,20)
@@ -104,7 +117,6 @@ local function successLogin()
     Status.TextColor3 = Color3.fromRGB(0,255,0)
     Status.Text = "Login Success!"
 
-    -- lưu thời gian
     saveData({
         key = VALID_KEY,
         time = os.time()
@@ -113,7 +125,6 @@ local function successLogin()
     wait(1)
     Frame:Destroy()
 
-    -- 👉 chỗ này chạy script chính
     print("RUN MAIN SCRIPT")
 end
 
@@ -129,11 +140,22 @@ Button.MouseButton1Click:Connect(function()
     doLogin(Box.Text)
 end)
 
--- AUTO LOGIN 24H
+-- 🔥 GET KEY CLICK
+GetKey.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(GET_KEY_LINK)
+        Status.Text = "Link copied!"
+    end
+
+    if syn and syn.request then
+        syn.request({Url = GET_KEY_LINK, Method = "GET"})
+    end
+end)
+
+-- AUTO LOGIN
 local data = loadData()
 if data and data.key == VALID_KEY then
-    local now = os.time()
-    if now - data.time < KEY_DURATION then
+    if os.time() - data.time < KEY_DURATION then
         successLogin()
     end
 end
