@@ -1,3 +1,70 @@
+
+--// MENU CONTROL (KHÔNG ĐỤNG ESP)
+
+local UIS = game:GetService("UserInputService")
+
+local ScreenGui2 = Instance.new("ScreenGui", game.CoreGui)
+
+local Main = Instance.new("Frame", ScreenGui2)
+Main.Size = UDim2.new(0,200,0,120)
+Main.Position = UDim2.new(0,20,0,260)
+Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1,0,0,30)
+Title.Text = "Menu Vandatdz"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.BackgroundTransparency = 1
+
+local ESPBtn = Instance.new("TextButton", Main)
+ESPBtn.Size = UDim2.new(0.8,0,0,30)
+ESPBtn.Position = UDim2.new(0.1,0,0.5,0)
+ESPBtn.Text = "ESP: ON"
+ESPBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+ESPBtn.TextColor3 = Color3.new(1,1,1)
+
+-- sync với biến ESP gốc
+ESPBtn.MouseButton1Click:Connect(function()
+    ESP_ENABLED = not ESP_ENABLED
+    ESPBtn.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
+end)
+
+-- toggle menu (RightShift)
+UIS.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        Main.Visible = not Main.Visible
+    end
+end)
+
+-- drag
+local dragging, dragStart, startPos
+
+Main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
 --// ESP by vandatdz
 --// GUI Toggle: RightShift
 
@@ -87,69 +154,3 @@ for _,v in pairs(Players:GetPlayers()) do
 end
 
 Players.PlayerAdded:Connect(CreateESP)
-
---// MENU CONTROL (KHÔNG ĐỤNG ESP)
-
-local UIS = game:GetService("UserInputService")
-
-local ScreenGui2 = Instance.new("ScreenGui", game.CoreGui)
-
-local Main = Instance.new("Frame", ScreenGui2)
-Main.Size = UDim2.new(0,200,0,120)
-Main.Position = UDim2.new(0,20,0,260)
-Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
-
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,30)
-Title.Text = "Menu Vandatdz"
-Title.TextColor3 = Color3.new(1,1,1)
-Title.BackgroundTransparency = 1
-
-local ESPBtn = Instance.new("TextButton", Main)
-ESPBtn.Size = UDim2.new(0.8,0,0,30)
-ESPBtn.Position = UDim2.new(0.1,0,0.5,0)
-ESPBtn.Text = "ESP: ON"
-ESPBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-ESPBtn.TextColor3 = Color3.new(1,1,1)
-
--- sync với biến ESP gốc
-ESPBtn.MouseButton1Click:Connect(function()
-    ESP_ENABLED = not ESP_ENABLED
-    ESPBtn.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
-end)
-
--- toggle menu (RightShift)
-UIS.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.RightShift then
-        Main.Visible = not Main.Visible
-    end
-end)
-
--- drag
-local dragging, dragStart, startPos
-
-Main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = Main.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        Main.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
