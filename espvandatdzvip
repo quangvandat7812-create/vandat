@@ -37,7 +37,7 @@ title.TextSize = 20
 local loginText = Instance.new("TextLabel", frame)
 loginText.Size = UDim2.new(1,0,0,20)
 loginText.Position = UDim2.new(0,0,0,40)
-loginText.Text = "Login"
+loginText.Text = "Login 👇"
 loginText.TextColor3 = Color3.new(1,1,1)
 loginText.BackgroundTransparency = 1
 
@@ -49,13 +49,32 @@ box.BackgroundColor3 = Color3.fromRGB(40,40,40)
 box.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", box)
 
+-- LOGIN BUTTON
 local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.5,0,0,30)
-btn.Position = UDim2.new(0.25,0,0.75,0)
+btn.Size = UDim2.new(0.4,0,0,30)
+btn.Position = UDim2.new(0.1,0,0.75,0)
 btn.Text = "LOGIN"
 btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
 btn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", btn)
+
+-- OPEN LINK BUTTON
+local linkBtn = Instance.new("TextButton", frame)
+linkBtn.Size = UDim2.new(0.4,0,0,30)
+linkBtn.Position = UDim2.new(0.5,0,0.75,0)
+linkBtn.Text = "OPEN LINK"
+linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
+linkBtn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", linkBtn)
+
+linkBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(LINK)
+        linkBtn.Text = "Đã copy!"
+        wait(1)
+        linkBtn.Text = "OPEN LINK"
+    end
+end)
 
 --================ MENU =================--
 
@@ -63,7 +82,7 @@ local function createMenu()
     frame:Destroy()
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,240,0,220)
+    main.Size = UDim2.new(0,240,0,180)
     main.Position = UDim2.new(0,20,0,200)
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
     Instance.new("UICorner", main)
@@ -82,24 +101,6 @@ local function createMenu()
     credit.BackgroundTransparency = 1
     credit.TextColor3 = Color3.fromRGB(150,150,150)
 
-    -- OPEN LINK BUTTON
-    local linkBtn = Instance.new("TextButton", main)
-    linkBtn.Size = UDim2.new(0.8,0,0,30)
-    linkBtn.Position = UDim2.new(0.1,0,0,40)
-    linkBtn.Text = "OPEN LINK"
-    linkBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-    linkBtn.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", linkBtn)
-
-    linkBtn.MouseButton1Click:Connect(function()
-        if setclipboard then
-            setclipboard(LINK)
-            linkBtn.Text = "Đã copy link!"
-            wait(1)
-            linkBtn.Text = "OPEN LINK"
-        end
-    end)
-
     local function button(name,y,state,callback)
         local b = Instance.new("TextButton", main)
         b.Size = UDim2.new(0.8,0,0,30)
@@ -116,8 +117,8 @@ local function createMenu()
         end)
     end
 
-    button("ESP",90,ESP,function(v) ESP=v end)
-    button("LINE",130,LINE,function(v) LINE=v end)
+    button("ESP",60,ESP,function(v) ESP=v end)
+    button("LINE",100,LINE,function(v) LINE=v end)
 
     -- DRAG MOBILE
     local drag, start, pos
@@ -148,20 +149,27 @@ end
 local function esp(p)
     if p == LocalPlayer then return end
 
-    local box = Drawing.new("Square")
     local line = Drawing.new("Line")
     local text = Drawing.new("Text")
 
+    text.Size = 14
+    text.Center = true
+    text.Outline = true
+    text.Color = Color3.fromRGB(255,255,255)
+
     local bones = {
         {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
-        {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},
-        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"}
+        {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
+        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
+        {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
+        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"}
     }
 
     local skel = {}
     for i=1,#bones do
         local l = Drawing.new("Line")
         l.Color = Color3.fromRGB(255,255,255)
+        l.Thickness = 2.5
         table.insert(skel,l)
     end
 
@@ -173,14 +181,8 @@ local function esp(p)
 
             if vis and ESP then
                 local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-                local scale = math.clamp(1/(dist/300),0.3,1)
 
-                box.Size = Vector2.new(30*scale,50*scale)
-                box.Position = Vector2.new(pos.X-(15*scale),pos.Y-(25*scale))
-                box.Color = Color3.fromRGB(255,0,0)
-                box.Visible = true
-
-                text.Position = Vector2.new(pos.X,pos.Y-(30*scale))
+                text.Position = Vector2.new(pos.X,pos.Y-40)
                 text.Text = p.Name.." ["..math.floor(dist).."m]"
                 text.Visible = true
 
@@ -188,6 +190,7 @@ local function esp(p)
                     line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
                     line.To = Vector2.new(pos.X,pos.Y)
                     line.Color = Color3.fromRGB(0,255,0)
+                    line.Thickness = 1.5
                     line.Visible = true
                 else
                     line.Visible = false
@@ -196,9 +199,11 @@ local function esp(p)
                 for i,b in ipairs(bones) do
                     local p1 = c:FindFirstChild(b[1])
                     local p2 = c:FindFirstChild(b[2])
+
                     if p1 and p2 then
                         local a,v1 = Camera:WorldToViewportPoint(p1.Position)
                         local b2,v2 = Camera:WorldToViewportPoint(p2.Position)
+
                         if v1 and v2 then
                             skel[i].From = Vector2.new(a.X,a.Y)
                             skel[i].To = Vector2.new(b2.X,b2.Y)
@@ -206,12 +211,13 @@ local function esp(p)
                         else
                             skel[i].Visible = false
                         end
+                    else
+                        skel[i].Visible = false
                     end
                 end
             else
-                box.Visible = false
-                line.Visible = false
                 text.Visible = false
+                line.Visible = false
                 for _,l in pairs(skel) do l.Visible=false end
             end
         end
