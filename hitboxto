@@ -1,4 +1,4 @@
---// VANDATDZ FULL PRO FINAL (ALL IN ONE)
+--// VANDATDZ FULL PRO FINAL (LOGO TOGGLE MENU)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -10,7 +10,6 @@ local Camera = workspace.CurrentCamera
 local ESP_ENABLED = true
 local AIM_ENABLED = false
 local HITBOX_ENABLED = false
-local LOGO_ENABLED = true
 
 local HITBOX_SIZE = 5
 
@@ -19,6 +18,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
+-- MAIN MENU
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0,230,0,300)
 Main.Position = UDim2.new(0,100,0,200)
@@ -30,23 +30,31 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
 local stroke = Instance.new("UIStroke", Main)
 stroke.Color = Color3.fromRGB(0,170,255)
 
--- LOGO
-local Logo = Instance.new("ImageLabel", Main)
-Logo.Size = UDim2.new(0,45,0,45)
-Logo.Position = UDim2.new(0,10,0,10)
+-- 🔥 LOGO (CLICK TO TOGGLE MENU)
+local Logo = Instance.new("ImageLabel", ScreenGui)
+Logo.Size = UDim2.new(0,50,0,50)
+Logo.Position = UDim2.new(0,20,0,200)
 Logo.BackgroundTransparency = 1
 Logo.Image = "rbxassetid://127839480332201"
 
+-- CLICK AREA
+local Click = Instance.new("TextButton", Logo)
+Click.Size = UDim2.new(1,0,1,0)
+Click.BackgroundTransparency = 1
+Click.Text = ""
+
+Click.MouseButton1Click:Connect(function()
+	Main.Visible = not Main.Visible
+end)
+
 -- TITLE
 local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,-60,0,30)
-Title.Position = UDim2.new(0,60,0,15)
+Title.Size = UDim2.new(1,0,0,40)
 Title.BackgroundTransparency = 1
 Title.Text = "VANDATDZ HUB"
 Title.TextColor3 = Color3.fromRGB(0,170,255)
-Title.TextSize = 18
 Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextSize = 18
 
 -- BUTTON
 local function Btn(text,y)
@@ -62,19 +70,11 @@ local function Btn(text,y)
 	return b
 end
 
-local ToggleESP = Btn("ESP: ON",70)
-local ToggleAim = Btn("AIM: OFF",105)
-local ToggleLogo = Btn("LOGO: ON",140)
-local ToggleHitbox = Btn("HITBOX: OFF",175)
-local SizeUp = Btn("SIZE +",210)
-local SizeDown = Btn("SIZE -",245)
-
--- MENU TOGGLE
-UIS.InputBegan:Connect(function(i)
-	if i.KeyCode == Enum.KeyCode.RightShift then
-		Main.Visible = not Main.Visible
-	end
-end)
+local ToggleESP = Btn("ESP: ON",60)
+local ToggleAim = Btn("AIM: OFF",100)
+local ToggleHitbox = Btn("HITBOX: OFF",140)
+local SizeUp = Btn("SIZE +",180)
+local SizeDown = Btn("SIZE -",220)
 
 -- TOGGLES
 ToggleESP.MouseButton1Click:Connect(function()
@@ -85,12 +85,6 @@ end)
 ToggleAim.MouseButton1Click:Connect(function()
 	AIM_ENABLED = not AIM_ENABLED
 	ToggleAim.Text = "AIM: "..(AIM_ENABLED and "ON" or "OFF")
-end)
-
-ToggleLogo.MouseButton1Click:Connect(function()
-	LOGO_ENABLED = not LOGO_ENABLED
-	Logo.Visible = LOGO_ENABLED
-	ToggleLogo.Text = "LOGO: "..(LOGO_ENABLED and "ON" or "OFF")
 end)
 
 ToggleHitbox.MouseButton1Click:Connect(function()
@@ -160,7 +154,6 @@ local function SetupESP(player)
 		RunService.RenderStepped:Connect(function()
 			if not char or not char.Parent then return end
 
-			-- ESP
 			if ESP_ENABLED then
 				hl.Enabled = true
 				bill.Enabled = true
@@ -182,7 +175,6 @@ local function SetupESP(player)
 				bill.Enabled = false
 			end
 
-			-- HITBOX
 			ApplyHitbox(char)
 		end)
 	end
