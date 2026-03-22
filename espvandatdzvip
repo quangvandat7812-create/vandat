@@ -1,8 +1,9 @@
---// VANDATDZ LOGIN ESP FULL
+--// VANDATDZ LOGIN ESP FULL FINAL
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
@@ -15,6 +16,29 @@ local LINK = "https://your-link-here.com"
 -- SETTINGS
 local ESP = true
 local LINE = true
+
+-- SAVE KEY 24H
+local SAVE_FILE = "vandat_key.txt"
+local EXPIRE = 86400
+
+local function saveKey(key)
+    if writefile then
+        writefile(SAVE_FILE, HttpService:JSONEncode({
+            key = key,
+            time = os.time()
+        }))
+    end
+end
+
+local function loadKey()
+    if readfile and isfile and isfile(SAVE_FILE) then
+        local data = HttpService:JSONDecode(readfile(SAVE_FILE))
+        if os.time() - data.time <= EXPIRE then
+            return data.key
+        end
+    end
+    return nil
+end
 
 --================ LOGIN UI =================--
 
@@ -37,7 +61,7 @@ title.TextSize = 20
 local loginText = Instance.new("TextLabel", frame)
 loginText.Size = UDim2.new(1,0,0,20)
 loginText.Position = UDim2.new(0,0,0,40)
-loginText.Text = "Login👇"
+loginText.Text = "Login"
 loginText.TextColor3 = Color3.new(1,1,1)
 loginText.BackgroundTransparency = 1
 
@@ -120,7 +144,7 @@ local function createMenu()
     button("ESP",60,ESP,function(v) ESP=v end)
     button("LINE",100,LINE,function(v) LINE=v end)
 
-    -- DRAG MOBILE
+    -- DRAG
     local drag, start, pos
     main.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.Touch then
@@ -173,7 +197,16 @@ local function esp(p)
         table.insert(skel,l)
     end
 
-    RunService.RenderStepped:Connect(function()
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if not p.Parent then
+            line:Remove()
+            text:Remove()
+            for _,l in pairs(skel) do l:Remove() end
+            connection:Disconnect()
+            return
+        end
+
         local c = p.Character
         if c and c:FindFirstChild("HumanoidRootPart") then
             local hrp = c.HumanoidRootPart
@@ -183,7 +216,7 @@ local function esp(p)
                 local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
 
                 text.Position = Vector2.new(pos.X,pos.Y-40)
-                text.Text = p.Name.." ["..math.floor(dist).."m]"
+                text.Text = "@"..p.Name.." ["..math.floor(dist).."m]"
                 text.Visible = true
 
                 if LINE then
@@ -226,11 +259,23 @@ end
 
 --================ LOGIN =================--
 
+local function startESP()
+    createMenu()
+    for _,v in pairs(Players:GetPlayers()) do esp(v) end
+    Players.PlayerAdded:Connect(esp)
+end
+
+-- AUTO LOGIN
+local saved = loadKey()
+if saved == KEY then
+    task.wait(0.5)
+    startESP()
+end
+
 btn.MouseButton1Click:Connect(function()
     if box.Text == KEY then
-        createMenu()
-        for _,v in pairs(Players:GetPlayers()) do esp(v) end
-        Players.PlayerAdded:Connect(esp)
+        saveKey(KEY)
+        startESP()
     else
         box.Text = ""
         box.PlaceholderText = "Sai key!"
