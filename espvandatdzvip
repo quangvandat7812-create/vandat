@@ -62,7 +62,7 @@ Instance.new("UICorner", btn)
 local linkBtn = Instance.new("TextButton", frame)
 linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
-linkBtn.Text = "GET KEY"
+linkBtn.Text = "OPEN LINK"
 linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
 linkBtn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", linkBtn)
@@ -72,7 +72,7 @@ linkBtn.MouseButton1Click:Connect(function()
         setclipboard(LINK)
         linkBtn.Text = "Đã copy!"
         wait(1)
-        linkBtn.Text = "GET KEY"
+        linkBtn.Text = "OPEN LINK"
     end
 end)
 
