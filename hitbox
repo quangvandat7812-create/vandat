@@ -1,1 +1,215 @@
+--// VANDATDZ ESP FULL VIP (KEY FIX)
 
+-- CLEAN GUI
+pcall(function()
+    game.CoreGui:FindFirstChild("VANDAT_GUI"):Destroy()
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+-- KEY
+local KEY = "vandatdz"
+
+-- SETTINGS
+local ESP, LINE, BOX3D, HITBOX, AIMLOCK = true, true, false, false, false
+local HITBOX_SCALE = 3
+local AIM_FOV = 150
+
+-- SAVE KEY
+local FILE = "vandat_key.txt"
+local EXPIRE = 86400
+
+local function saveKey(key)
+    if writefile then
+        writefile(FILE, HttpService:JSONEncode({key = key,time = os.time()}))
+    end
+end
+
+local function loadKey()
+    if readfile and isfile and isfile(FILE) then
+        local data = HttpService:JSONDecode(readfile(FILE))
+        if os.time() - data.time <= EXPIRE then
+            return data.key
+        end
+    end
+    return nil
+end
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "VANDAT_GUI"
+gui.Parent = game.CoreGui
+
+--================ LOGIN =================--
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,260,0,180)
+frame.Position = UDim2.new(0.5,-130,0.5,-90)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Instance.new("UICorner", frame)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,40)
+title.Text = "Login Menu VanDatdz"
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.8,0,0,35)
+box.Position = UDim2.new(0.1,0,0.4,0)
+box.PlaceholderText = "Enter key..."
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", box)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.4,0,0,30)
+btn.Position = UDim2.new(0.3,0,0.75,0)
+btn.Text = "LOGIN"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
+
+--================ MENU =================--
+
+local function createMenu()
+    frame:Destroy()
+
+    local main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0,240,0,300)
+    main.Position = UDim2.new(0,20,0,200)
+    main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Instance.new("UICorner", main)
+
+    local title = Instance.new("TextLabel", main)
+    title.Size = UDim2.new(1,0,0,30)
+    title.Text = "Menu Vandatdz Esp"
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(0,255,255)
+    title.Font = Enum.Font.GothamBold
+
+    local function button(name,y,state,callback)
+        local b = Instance.new("TextButton", main)
+        b.Size = UDim2.new(0.8,0,0,30)
+        b.Position = UDim2.new(0.1,0,0,y)
+        b.Text = name..": "..(state and "ON" or "OFF")
+        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+        b.TextColor3 = Color3.new(1,1,1)
+        Instance.new("UICorner", b)
+
+        b.MouseButton1Click:Connect(function()
+            state = not state
+            b.Text = name..": "..(state and "ON" or "OFF")
+            callback(state)
+        end)
+    end
+
+    button("ESP",40,ESP,function(v) ESP=v end)
+    button("LINE",80,LINE,function(v) LINE=v end)
+    button("BOX3D",120,BOX3D,function(v) BOX3D=v end)
+    button("HITBOX",160,HITBOX,function(v) HITBOX=v end)
+    button("AIMLOCK",200,AIMLOCK,function(v) AIMLOCK=v end)
+
+    -- SLIDER
+    local slider = Instance.new("TextButton", main)
+    slider.Size = UDim2.new(0.8,0,0,30)
+    slider.Position = UDim2.new(0.1,0,0,240)
+    slider.Text = "SIZE: "..HITBOX_SCALE
+    slider.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    slider.TextColor3 = Color3.new(1,1,1)
+
+    slider.MouseButton1Click:Connect(function()
+        HITBOX_SCALE += 1
+        if HITBOX_SCALE > 10 then HITBOX_SCALE = 2 end
+        slider.Text = "SIZE: "..HITBOX_SCALE
+    end)
+
+    -- DRAG
+    local dragging, dragStart, startPos
+    main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
+        end
+    end)
+
+    UIS.InputEnded:Connect(function()
+        dragging = false
+    end)
+
+    -- LOGO
+    local logo = Instance.new("ImageButton", gui)
+    logo.Size = UDim2.new(0,65,0,65)
+    logo.Position = UDim2.new(1,-80,0,120)
+    logo.Image = "rbxassetid://127839480332201"
+    logo.BackgroundTransparency = 1
+
+    local open = true
+    logo.MouseButton1Click:Connect(function()
+        open = not open
+        main.Visible = open
+    end)
+end
+
+-- HITBOX
+local function applyHitbox(p)
+    RunService.RenderStepped:Connect(function()
+        if not p.Parent then return end
+        local char = p.Character
+        if not char then return end
+
+        for _,part in pairs(char:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                if not part:FindFirstChild("OriginalSize") then
+                    local v = Instance.new("Vector3Value")
+                    v.Name = "OriginalSize"
+                    v.Value = part.Size
+                    v.Parent = part
+                end
+
+                if HITBOX then
+                    part.Size = part.OriginalSize.Value * (HITBOX_SCALE/2)
+                    part.Color = Color3.fromRGB(255,0,0)
+                    part.Material = Enum.Material.Neon
+                    part.Transparency = 0.3
+                else
+                    part.Size = part.OriginalSize.Value
+                    part.Transparency = 0
+                    part.Material = Enum.Material.Plastic
+                end
+            end
+        end
+    end)
+end
+
+-- ESP
+local function esp(p)
+    if p == LocalPlayer then return end
+
+    local line = Drawing.new("Line")
+    local text = Drawing.new("Text")
+    local box = Drawing.new("Square")
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if not p.Parent then
+            line:Remove()
+            text:Remove()
+            box:Remove()
+            conn:Disconnect()
+            return
