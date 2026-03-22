@@ -1,4 +1,4 @@
---// VANDATDZ ESP FINAL (LOGO TOGGLE MENU)
+--// VANDATDZ FULL VIP LOGIN
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -9,21 +9,24 @@ local LocalPlayer = Players.LocalPlayer
 
 -- KEY
 local KEY = "vandatdz"
-
--- LINK
 local LINK = "https://your-link-here.com"
 
 -- SETTINGS
 local ESP = true
 local LINE = true
+local HITBOX = false
+local AIMLOCK = false
+
+local HITBOX_SIZE = Vector3.new(3,3,3)
+local AIM_FOV = 150
 
 -- SAVE KEY
-local SAVE_FILE = "vandat_key.txt"
+local FILE = "vandat_key.txt"
 local EXPIRE = 86400
 
 local function saveKey(key)
     if writefile then
-        writefile(SAVE_FILE, HttpService:JSONEncode({
+        writefile(FILE, HttpService:JSONEncode({
             key = key,
             time = os.time()
         }))
@@ -31,8 +34,8 @@ local function saveKey(key)
 end
 
 local function loadKey()
-    if readfile and isfile and isfile(SAVE_FILE) then
-        local data = HttpService:JSONDecode(readfile(SAVE_FILE))
+    if readfile and isfile and isfile(FILE) then
+        local data = HttpService:JSONDecode(readfile(FILE))
         if os.time() - data.time <= EXPIRE then
             return data.key
         end
@@ -40,8 +43,7 @@ local function loadKey()
     return nil
 end
 
---================ LOGIN UI =================--
-
+-- GUI LOGIN
 local gui = Instance.new("ScreenGui", game.CoreGui)
 
 local frame = Instance.new("Frame", gui)
@@ -52,43 +54,26 @@ Instance.new("UICorner", frame)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,40)
-title.Text = "Vandatdz"
+title.Text = "Vandatdz Login"
 title.TextColor3 = Color3.fromRGB(0,255,255)
 title.BackgroundTransparency = 1
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-
-local loginText = Instance.new("TextLabel", frame)
-loginText.Size = UDim2.new(1,0,0,20)
-loginText.Position = UDim2.new(0,0,0,40)
-loginText.Text = "Login"
-loginText.TextColor3 = Color3.new(1,1,1)
-loginText.BackgroundTransparency = 1
 
 local box = Instance.new("TextBox", frame)
 box.Size = UDim2.new(0.8,0,0,35)
 box.Position = UDim2.new(0.1,0,0.4,0)
 box.PlaceholderText = "Enter key..."
-box.BackgroundColor3 = Color3.fromRGB(40,40,40)
-box.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", box)
 
 local btn = Instance.new("TextButton", frame)
 btn.Size = UDim2.new(0.4,0,0,30)
 btn.Position = UDim2.new(0.1,0,0.75,0)
 btn.Text = "LOGIN"
-btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-btn.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", btn)
 
 local linkBtn = Instance.new("TextButton", frame)
 linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
 linkBtn.Text = "OPEN LINK"
-linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
-linkBtn.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", linkBtn)
 
+-- COPY LINK
 linkBtn.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(LINK)
@@ -104,33 +89,16 @@ local function createMenu()
     frame:Destroy()
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,240,0,180)
+    main.Size = UDim2.new(0,240,0,200)
     main.Position = UDim2.new(0,20,0,200)
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
     Instance.new("UICorner", main)
-
-    local title = Instance.new("TextLabel", main)
-    title.Size = UDim2.new(1,0,0,30)
-    title.Text = "Menu VandatdzESP"
-    title.BackgroundTransparency = 1
-    title.TextColor3 = Color3.fromRGB(0,255,255)
-    title.Font = Enum.Font.GothamBold
-
-    local credit = Instance.new("TextLabel", main)
-    credit.Size = UDim2.new(1,0,0,20)
-    credit.Position = UDim2.new(0,0,1,-20)
-    credit.Text = "by:vandatdz"
-    credit.BackgroundTransparency = 1
-    credit.TextColor3 = Color3.fromRGB(150,150,150)
 
     local function button(name,y,state,callback)
         local b = Instance.new("TextButton", main)
         b.Size = UDim2.new(0.8,0,0,30)
         b.Position = UDim2.new(0.1,0,0,y)
         b.Text = name..": "..(state and "ON" or "OFF")
-        b.BackgroundColor3 = Color3.fromRGB(40,40,40)
-        b.TextColor3 = Color3.new(1,1,1)
-        Instance.new("UICorner", b)
 
         b.MouseButton1Click:Connect(function()
             state = not state
@@ -139,82 +107,64 @@ local function createMenu()
         end)
     end
 
-    button("ESP",60,ESP,function(v) ESP=v end)
-    button("LINE",100,LINE,function(v) LINE=v end)
+    button("ESP",40,ESP,function(v) ESP=v end)
+    button("LINE",80,LINE,function(v) LINE=v end)
+    button("HITBOX",120,HITBOX,function(v) HITBOX=v end)
+    button("AIMLOCK",160,AIMLOCK,function(v) AIMLOCK=v end)
 
-    -- DRAG MENU
-    local drag, start, pos
-    main.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.Touch then
-            drag = true
-            start = i.Position
-            pos = main.Position
-        end
-    end)
-
-    UIS.InputChanged:Connect(function(i)
-        if drag and i.UserInputType == Enum.UserInputType.Touch then
-            local delta = i.Position - start
-            main.Position = UDim2.new(pos.X.Scale,pos.X.Offset+delta.X,pos.Y.Scale,pos.Y.Offset+delta.Y)
-        end
-    end)
-
-    UIS.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.Touch then
-            drag = false
-        end
-    end)
-
-    --================ LOGO PNG TOGGLE MENU =================--
-
+    -- LOGO
     local logo = Instance.new("ImageButton", gui)
     logo.Size = UDim2.new(0,65,0,65)
     logo.Position = UDim2.new(1,-80,0,120)
     logo.Image = "rbxassetid://127839480332201"
     logo.BackgroundTransparency = 1
 
-    local stroke = Instance.new("UIStroke", logo)
-    stroke.Thickness = 2
-    stroke.Color = Color3.fromRGB(0,255,255)
-
-    local menuOpen = true
-
+    local open = true
     logo.MouseButton1Click:Connect(function()
-        menuOpen = not menuOpen
-        main.Visible = menuOpen
+        open = not open
+        main.Visible = open
     end)
+end
 
-    -- DRAG LOGO
-    local dragging, startPos, startInput
+--================ FEATURES =================--
 
-    logo.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            startInput = input.Position
-            startPos = logo.Position
-        end
-    end)
-
-    UIS.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.Touch then
-            local delta = input.Position - startInput
-            logo.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-
-    UIS.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
+local function applyHitbox(p)
+    RunService.RenderStepped:Connect(function()
+        if not HITBOX then return end
+        if p.Character and p.Character:FindFirstChild("Head") then
+            local h = p.Character.Head
+            h.Size = HITBOX_SIZE
+            h.Transparency = 0.3
+            h.Material = Enum.Material.Neon
         end
     end)
 end
 
---================ ESP =================--
+local function getClosest()
+    local closest, dist = nil, AIM_FOV
+    for _,v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local pos, vis = Camera:WorldToViewportPoint(v.Character.Head.Position)
+            if vis then
+                local d = (Vector2.new(pos.X,pos.Y) - Camera.ViewportSize/2).Magnitude
+                if d < dist then
+                    dist = d
+                    closest = v
+                end
+            end
+        end
+    end
+    return closest
+end
+
+RunService.RenderStepped:Connect(function()
+    if AIMLOCK then
+        local t = getClosest()
+        if t and t.Character and t.Character:FindFirstChild("Head") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Character.Head.Position)
+        end
+    end
+end)
 
 local function esp(p)
     if p == LocalPlayer then return end
@@ -222,110 +172,57 @@ local function esp(p)
     local line = Drawing.new("Line")
     local text = Drawing.new("Text")
 
-    text.Size = 14
-    text.Center = true
-    text.Outline = true
-    text.Color = Color3.fromRGB(255,255,255)
-
-    local bones = {
-        {"Head","UpperTorso"},{"Head","Torso"},
-        {"UpperTorso","LowerTorso"},{"Torso","HumanoidRootPart"},
-        {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},{"LeftLowerArm","LeftHand"},
-        {"Torso","Left Arm"},
-        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},{"RightLowerArm","RightHand"},
-        {"Torso","Right Arm"},
-        {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},{"LeftLowerLeg","LeftFoot"},
-        {"Torso","Left Leg"},
-        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"},{"RightLowerLeg","RightFoot"},
-        {"Torso","Right Leg"}
-    }
-
-    local skel = {}
-    for i=1,#bones do
-        local l = Drawing.new("Line")
-        l.Color = Color3.fromRGB(255,255,255)
-        l.Thickness = 3
-        table.insert(skel,l)
-    end
-
-    local connection
-    connection = RunService.RenderStepped:Connect(function()
-        if not p.Parent then
-            line:Remove()
-            text:Remove()
-            for _,l in pairs(skel) do l:Remove() end
-            connection:Disconnect()
-            return
-        end
-
+    RunService.RenderStepped:Connect(function()
+        if not p.Parent then return end
         local c = p.Character
         if c and c:FindFirstChild("HumanoidRootPart") then
             local hrp = c.HumanoidRootPart
-            local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
+            local pos = Camera:WorldToViewportPoint(hrp.Position)
 
-            if vis and ESP then
-                local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-
-                text.Position = Vector2.new(pos.X,pos.Y-40)
-                text.Text = "@"..p.Name.." ["..math.floor(dist).."m]"
+            if ESP then
+                local name = p.DisplayName ~= "" and p.DisplayName or p.Name
+                text.Text = "@"..name
+                text.Position = Vector2.new(pos.X,pos.Y-30)
                 text.Visible = true
 
                 if LINE then
                     line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
                     line.To = Vector2.new(pos.X,pos.Y)
-                    line.Color = Color3.fromRGB(0,255,0)
                     line.Visible = true
                 else
                     line.Visible = false
                 end
-
-                for i,b in ipairs(bones) do
-                    local p1 = c:FindFirstChild(b[1], true)
-                    local p2 = c:FindFirstChild(b[2], true)
-
-                    if p1 and p2 then
-                        local a,v1 = Camera:WorldToViewportPoint(p1.Position)
-                        local b2,v2 = Camera:WorldToViewportPoint(p2.Position)
-
-                        if v1 and v2 then
-                            skel[i].From = Vector2.new(a.X,a.Y)
-                            skel[i].To = Vector2.new(b2.X,b2.Y)
-                            skel[i].Visible = true
-                        else
-                            skel[i].Visible = false
-                        end
-                    else
-                        skel[i].Visible = false
-                    end
-                end
             else
                 text.Visible = false
                 line.Visible = false
-                for _,l in pairs(skel) do l.Visible=false end
             end
         end
     end)
 end
 
---================ START =================--
-
-local function startESP()
+local function start()
     createMenu()
-    for _,v in pairs(Players:GetPlayers()) do esp(v) end
-    Players.PlayerAdded:Connect(esp)
+    for _,v in pairs(Players:GetPlayers()) do
+        esp(v)
+        applyHitbox(v)
+    end
+    Players.PlayerAdded:Connect(function(v)
+        esp(v)
+        applyHitbox(v)
+    end)
 end
 
 -- AUTO LOGIN
 local saved = loadKey()
 if saved == KEY then
     task.wait(0.5)
-    startESP()
+    start()
 end
 
 btn.MouseButton1Click:Connect(function()
     if box.Text == KEY then
         saveKey(KEY)
-        startESP()
+        start()
     else
         box.Text = ""
         box.PlaceholderText = "Sai key!"
