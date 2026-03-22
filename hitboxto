@@ -1,0 +1,110 @@
+local Debris = game:GetService("Debris") -- Dùng để tự dọn dẹp VFX
+
+-- --- CẤU HÌNH CHIÊU THỨC ---
+local HITBOX_RADIUS = 50 -- Bán kính Hitbox (Cực to, nửa bản đồ nhỏ)
+local DAMAGE = 1000      -- Sát thương 1,000
+local KNOCKBACK_FORCE = 150 -- Lực đẩy văng kẻ địch (Rất mạnh)
+local COOLDOWN = 10      -- Thời gian hồi chiêu (giây)
+
+local db = false -- Trạng thái hồi chiêu (Debounce)
+
+-- --- HÀM TẠO VFX HITBOX TRỰC QUAN (Cho người chơi thấy độ TO) ---
+local function CreateVisualHitbox(position)
+	-- Tạo một khối cầu bán trong suốt để biểu diễn vùng sát thương
+	local sphere = Instance.new("Part")
+	sphere.Name = "SlashVFX"
+	sphere.Shape = Enum.PartType.Ball
+	sphere.Material = Enum.Material.ForceField -- Nhìn ảo diệu
+	sphere.Color = Color3.fromRGB(255, 0, 0) -- Màu đỏ cảnh báo
+	sphere.Transparency = 0.5
+	sphere.Anchored = true
+	sphere.CanCollide = false
+	sphere.Position = position
+	
+	-- Kích thước ban đầu nhỏ, sau đó phình to ra
+	sphere.Size = Vector3.new(1, 1, 1)
+	sphere.Parent = workspace
+	
+	-- TweenService để làm hiệu ứng phình to mượt mà (Tùy chọn, ở đây làm thủ công cho đơn giản)
+	local finalSize = Vector3.new(HITBOX_RADIUS * 2, HITBOX_RADIUS * 2, HITBOX_RADIUS * 2)
+	
+	-- Hiệu ứng phình to nhanh
+	local tweenService = game:GetService("TweenService")
+	local info = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+	local tween = tweenService:Create(sphere, info, {Size = finalSize, Transparency = 1})
+	tween:Play()
+	
+	-- Tự xóa sau 0.5 giây
+	Debris:AddItem(sphere, 0.5)
+end
+
+-- --- HÀM XỬ LÝ GÂY SÁT THƯƠNG ---
+local function PerformUltimateAttack(player)
+	if db then return end -- Đang hồi chiêu thì không cho dùng
+	db = true
+	
+	local character = player.Character
+	if not character or not character:FindFirstChild("HumanoidRootPart") then 
+		db = false 
+		return 
+	end
+	
+	local rootPart = character.HumanoidRootPart
+	local attackOrigin = rootPart.Position
+	
+	print("--- KÍCH HOẠT TUYỆT CHIÊU (HITBOX TO) ---")
+	
+	-- 1. Tạo hiệu ứng Visual
+	CreateVisualHitbox(attackOrigin)
+	
+	-- 2. Thiết lập thông số quét Hitbox
+	local overlapParams = OverlapParams.new()
+	overlapParams.FilterDescendantsInstances = {character} -- Không tự chém mình
+	overlapParams.FilterType = Enum.RaycastFilterType.Exclude
+	overlapParams.CollisionGroup = "Default" -- Hoặc nhóm va chạm cụ thể của bạn
+
+	-- 3. QUÉT HITBOX CỰC LỚN (Spatial Query)
+	local partsInHitbox = workspace:GetPartBoundsInRadius(attackOrigin, HITBOX_RADIUS, overlapParams)
+	
+	local hitHumanoids = {} -- Bảng ghi nhớ để không gây sát thương 2 lần trên 1 mục tiêu
+
+	-- 4. Xử lý kết quả quét
+	for _, part in pairs(partsInHitbox) do
+		local model = part.Parent
+		local humanoid = model:FindFirstChild("Humanoid")
+		local targetRoot = model:FindFirstChild("HumanoidRootPart")
+		
+		-- Kiểm tra hợp lệ và chưa bị hit
+		if humanoid and targetRoot and humanoid.Health > 0 and not hitHumanoids[humanoid] then
+			hitHumanoids[humanoid] = true -- Đánh dấu đã trúng
+			
+			-- >>> GÂY SÁT THƯƠNG 1,000 <<<
+			humanoid:TakeDamage(DAMAGE)
+			
+			-- >>> HIỆU ỨNG ĐẨY LÙI CỰC MẠNH <<<
+			-- Tính hướng vector từ tâm đến mục tiêu
+			local pushDirection = (targetRoot.Position - attackOrigin).Unit
+			-- Đẩy mục tiêu văng ra và hơi nảy lên trời
+			targetRoot.AssemblyLinearVelocity = (pushDirection + Vector3.new(0, 0.3, 0)) * KNOCKBACK_FORCE
+			
+			-- Tạo hiệu ứng máu hoặc particle nhỏ trên kẻ địch (Tùy chọn)
+			print("Đã chém trúng: " .. model.Name .. " với 1k Damage!")
+		end
+	end
+	
+	-- 5. Thời gian hồi chiêu
+	task.wait(COOLDOWN)
+	db = false
+	print("--- TUYỆT CHIÊU ĐÃ HỒI ---")
+end
+
+-- --- LẮP ĐẶT SỰ KIỆN (Để test) ---
+-- Trong thực tế, bạn sẽ nối hàm PerformUltimateAttack với một RemoteEvent từ Client khi nhấn phím
+-- Ví dụ này dùng sự kiện PlayerAdded để test: Chém ngay khi spawn (chỉ để test)
+
+game.Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+		task.wait(2) -- Chờ load xong
+		PerformUltimateAttack(player)
+	end)
+end)
