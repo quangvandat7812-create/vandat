@@ -12,7 +12,7 @@ local VALID_KEY = "vandatdz"
 local KEY_DURATION = 24 * 60 * 60 -- 24h
 
 -- LINK GET KEY
-local GET_KEY_LINK = "https://link4m.com/VMtwi" -- 👉 đổi link tại đây
+local GET_KEY_LINK = "https://link4m.com/VMtwi"
 
 -- SAVE / LOAD
 local HttpService = game:GetService("HttpService")
@@ -31,7 +31,8 @@ local function loadData()
 end
 
 -- GUI
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("CoreGui")
 
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0,300,0,220)
@@ -59,7 +60,7 @@ Button.Text = "LOGIN"
 Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
 Button.TextColor3 = Color3.new(1,1,1)
 
--- 🔥 NÚT GET KEY
+-- GET KEY
 local GetKey = Instance.new("TextButton", Frame)
 GetKey.Size = UDim2.new(0.8,0,0,30)
 GetKey.Position = UDim2.new(0.1,0,0.75,0)
@@ -125,7 +126,8 @@ local function successLogin()
     wait(1)
     Frame:Destroy()
 
-    print("loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/main/esp.lua"))()")
+    -- FIX: chạy script thay vì print + sửa lỗi dấu "
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/main/esp.lua"))()
 end
 
 local function doLogin(key)
@@ -140,21 +142,19 @@ Button.MouseButton1Click:Connect(function()
     doLogin(Box.Text)
 end)
 
--- 🔥 GET KEY CLICK
+-- GET KEY CLICK
 GetKey.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(GET_KEY_LINK)
         Status.Text = "Link copied!"
-    end
-
-    if syn and syn.request then
-        syn.request({Url = GET_KEY_LINK, Method = "GET"})
+    else
+        Status.Text = "Copy link manually!"
     end
 end)
 
--- AUTO LOGIN
+-- AUTO LOGIN (FIX lỗi nil time)
 local data = loadData()
-if data and data.key == VALID_KEY then
+if data and data.key == VALID_KEY and data.time then
     if os.time() - data.time < KEY_DURATION then
         successLogin()
     end
