@@ -41,7 +41,7 @@ loginText.Text = "Login 👇"
 loginText.TextColor3 = Color3.new(1,1,1)
 loginText.BackgroundTransparency = 1
 
-local box = Instance.new("TextBox", frame)
+local box = Instance.new("Nhập Key Ở Đây😉", frame)
 box.Size = UDim2.new(0.8,0,0,35)
 box.Position = UDim2.new(0.1,0,0.4,0)
 box.PlaceholderText = "Enter key..."
@@ -62,7 +62,7 @@ Instance.new("UICorner", btn)
 local linkBtn = Instance.new("TextButton", frame)
 linkBtn.Size = UDim2.new(0.4,0,0,30)
 linkBtn.Position = UDim2.new(0.5,0,0.75,0)
-linkBtn.Text = "OPEN LINK"
+linkBtn.Text = "GET KEY LINK"
 linkBtn.BackgroundColor3 = Color3.fromRGB(0,200,120)
 linkBtn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", linkBtn)
