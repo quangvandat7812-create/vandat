@@ -1,4 +1,4 @@
---// VANDATDZ FULL PRO FINAL (LOGO TOGGLE MENU)
+--// VANDATDZ FULL PRO FINAL (ROUND LOGO DRAG)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -30,14 +30,24 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
 local stroke = Instance.new("UIStroke", Main)
 stroke.Color = Color3.fromRGB(0,170,255)
 
--- 🔥 LOGO (CLICK TO TOGGLE MENU)
+-- 🔥 LOGO TRÒN (DRAG + TOGGLE)
 local Logo = Instance.new("ImageLabel", ScreenGui)
-Logo.Size = UDim2.new(0,50,0,50)
+Logo.Size = UDim2.new(0,60,0,60)
 Logo.Position = UDim2.new(0,20,0,200)
-Logo.BackgroundTransparency = 1
+Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Logo.Image = "rbxassetid://127839480332201"
+Logo.Active = true
 
--- CLICK AREA
+-- bo tròn
+local corner = Instance.new("UICorner", Logo)
+corner.CornerRadius = UDim.new(1,0)
+
+-- viền đẹp
+local stroke2 = Instance.new("UIStroke", Logo)
+stroke2.Color = Color3.fromRGB(0,170,255)
+stroke2.Thickness = 2
+
+-- click
 local Click = Instance.new("TextButton", Logo)
 Click.Size = UDim2.new(1,0,1,0)
 Click.BackgroundTransparency = 1
@@ -45,6 +55,42 @@ Click.Text = ""
 
 Click.MouseButton1Click:Connect(function()
 	Main.Visible = not Main.Visible
+end)
+
+-- DRAG LOGO
+local dragging = false
+local dragInput, dragStart, startPos
+
+Logo.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Logo.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+Logo.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		Logo.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
 end)
 
 -- TITLE
