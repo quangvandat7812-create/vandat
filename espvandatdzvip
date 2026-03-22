@@ -1,0 +1,96 @@
+--// ESP by vandatdz (UI đẹp)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+local ESP_ENABLED = true
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 180, 0, 100)
+Main.Position = UDim2.new(0, 20, 0, 200)
+Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Main.BorderSizePixel = 0
+
+-- Bo góc
+local UICorner = Instance.new("UICorner", Main)
+UICorner.CornerRadius = UDim.new(0, 10)
+
+-- Gradient
+local UIGradient = Instance.new("UIGradient", Main)
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40,40,40))
+}
+
+-- Title
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1,0,0,30)
+Title.Text = "ESP MENU"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+
+-- Credit
+local Credit = Instance.new("TextLabel", Main)
+Credit.Size = UDim2.new(1,0,0,20)
+Credit.Position = UDim2.new(0,0,1,-20)
+Credit.Text = "by vandatdz"
+Credit.TextColor3 = Color3.fromRGB(150,150,150)
+Credit.BackgroundTransparency = 1
+Credit.Font = Enum.Font.Gotham
+Credit.TextSize = 12
+
+-- Toggle Button
+local Toggle = Instance.new("TextButton", Main)
+Toggle.Size = UDim2.new(0.8,0,0,40)
+Toggle.Position = UDim2.new(0.1,0,0.4,0)
+Toggle.Text = "ESP: ON"
+Toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Toggle.TextColor3 = Color3.fromRGB(0,255,0)
+Toggle.Font = Enum.Font.GothamBold
+Toggle.TextSize = 14
+
+local UICorner2 = Instance.new("UICorner", Toggle)
+UICorner2.CornerRadius = UDim.new(0,8)
+
+Toggle.MouseButton1Click:Connect(function()
+    ESP_ENABLED = not ESP_ENABLED
+    Toggle.Text = "ESP: "..(ESP_ENABLED and "ON" or "OFF")
+    Toggle.TextColor3 = ESP_ENABLED and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+-- Drag GUI
+local dragging, dragInput, dragStart, startPos
+
+Main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+    end
+end)
+
+Main.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if dragging then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
