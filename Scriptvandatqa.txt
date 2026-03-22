@@ -1,6 +1,6 @@
 -- 1️⃣ KHAI BÁO KEY & LINK GET KEY
-local key = "quynhanh1312" -- Key bạn đặt
-local keyLink = "https://link4sub.com/9S7B" -- Link khi ấn "Get Key"
+local key = "vandatdz" -- Key bạn đặt
+local keyLink = "https://link4m.com/UBsKAfBI" -- Link khi ấn "Get Key"
 
 -- 2️⃣ GIAO DIỆN NHẬP KEY
 local CoreGui = game:GetService("CoreGui")
@@ -130,8 +130,8 @@ repeat wait() until game:IsLoaded()
 
 -- 🪟 Cửa sổ chính
 local Window = Fluent:CreateWindow({
-	Title = "Quynh Anh ✅️ =}",         -- 👈 đổi thành tên script của bạn
-	SubTitle = "I Love You 💝",              -- 👈 đổi mô tả phụ
+	Title = "VanDatdz Hub =}",         -- 👈 đổi thành tên script của bạn
+	SubTitle = "Script Esp ",              -- 👈 đổi mô tả phụ
 	TabWidth = 157,
 	Size = UDim2.fromOffset(450, 300),
 	Acrylic = true,
@@ -141,52 +141,15 @@ local Window = Fluent:CreateWindow({
 
 -- 📑 Các tab (mục chính)
 local Tabs = {
-	Main0 = Window:AddTab({ Title = "TikTok✅️" }),  -- 👈 đổi tên tab 1
-	Main2 = Window:AddTab({ Title = "Cướp brainrot" }),     -- 👈 đổi tên tab 3
-	Main3 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
-	Main4 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
+	Main0 = Window:AddTab({ Title = "Script Esp" }),  -- 👈 đổi tên tab 
 
 ------------------------------------------------
 -- TAB 1: Các kênh tiktok
 ------------------------------------------------
 Tabs.Main0:AddButton({
-	Title = "tiktok bạn:)",              -- 👈 tên nút
-	Description = "oách xà lách vô cùng",-- 👈 mô tả nút
+	Title = "Script Esp",              -- 👈 tên nút
+	Description = "esp mọi tụa game",-- 👈 mô tả nút
 	Callback = function()
-		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa)  -- 👈 link sao chép
-	end
-})
-
-Tabs.Main0:AddButton({
-	Title = "tik",
-	Description = "làm chơi thui",
-	Callback = function()
-		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa
-})
-
-Tabs.Main0:AddButton({
-	Title = "tiktok",
-	Description = "fl tiktok để biết thêm nhiều script",
-	Callback = function()
-		setclipboard("https://www.tiktok.com/@vanwdatcaythue?_r=1&_t=ZS-91k26OwBAXa")
-	end
-})
-
-------------------------------------------------
--- TAB 2: Ví dụ thêm script
-------------------------------------------------
-Tabs.Main4:AddButton({
-	Title = "Zis Hub",                             -- 👈 tên nút hiển thị
-	Description = "Fam Ngon",-- 👈 mô tả
-	Callback = function()
-	loadstring(game:HttpGet("https://github.com/LuaCrack/Zis/raw/refs/heads/main/ZisUp27Vn"))()
-	end
-})
-
-Tabs.Main4:AddButton({
-	Title = "w-azezu",                             -- 👈 tên nút hiển thị
-	Description = "tiktok:vanwdatcaythue✅️",-- 👈 mô tả
-	Callback = function()
-	loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/85e904ae1ff30824c1aa007fc7324f8f.lua"))()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/quangvandat7812-create/vandat/refs/heads/main/esp"))()  -- 👈 link sao chép
 	end
 })
