@@ -1,4 +1,4 @@
---// VANDATDZ FULL PRO FINAL (ROUND LOGO DRAG)
+--// VANDATDZ FULL PRO FINAL (ROUND LOGO DRAG FIX)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -30,7 +30,7 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0,10)
 local stroke = Instance.new("UIStroke", Main)
 stroke.Color = Color3.fromRGB(0,170,255)
 
--- 🔥 LOGO TRÒN (DRAG + TOGGLE)
+-- 🔥 LOGO TRÒN
 local Logo = Instance.new("ImageLabel", ScreenGui)
 Logo.Size = UDim2.new(0,60,0,60)
 Logo.Position = UDim2.new(0,20,0,200)
@@ -38,30 +38,28 @@ Logo.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Logo.Image = "rbxassetid://127839480332201"
 Logo.Active = true
 
--- bo tròn
-local corner = Instance.new("UICorner", Logo)
-corner.CornerRadius = UDim.new(1,0)
+Instance.new("UICorner", Logo).CornerRadius = UDim.new(1,0)
 
--- viền đẹp
 local stroke2 = Instance.new("UIStroke", Logo)
 stroke2.Color = Color3.fromRGB(0,170,255)
 stroke2.Thickness = 2
 
--- click
+-- CLICK LAYER
 local Click = Instance.new("TextButton", Logo)
 Click.Size = UDim2.new(1,0,1,0)
 Click.BackgroundTransparency = 1
 Click.Text = ""
 
+-- TOGGLE MENU
 Click.MouseButton1Click:Connect(function()
 	Main.Visible = not Main.Visible
 end)
 
--- DRAG LOGO
+-- 🔥 DRAG FIX (DÙNG CLICK)
 local dragging = false
 local dragInput, dragStart, startPos
 
-Logo.InputBegan:Connect(function(input)
+Click.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
@@ -75,7 +73,7 @@ Logo.InputBegan:Connect(function(input)
 	end
 end)
 
-Logo.InputChanged:Connect(function(input)
+Click.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement then
 		dragInput = input
 	end
