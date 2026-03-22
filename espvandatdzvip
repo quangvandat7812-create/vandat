@@ -1,62 +1,70 @@
---// VANDATDZ ESP PASSWORD
-
-local PASSWORD = "vandatdz" -- đổi mật khẩu tại đây
+--// VANDATDZ PRO MAX FULL
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- GUI LOGIN
-local gui = Instance.new("ScreenGui", game.CoreGui)
+--================ KEY SYSTEM =================--
 
-local login = Instance.new("Frame", gui)
-login.Size = UDim2.new(0,250,0,140)
-login.Position = UDim2.new(0.5,-125,0.5,-70)
-login.BackgroundColor3 = Color3.fromRGB(25,25,25)
-Instance.new("UICorner", login)
+local FILE = "vandat_key.json"
 
-local title = Instance.new("TextLabel", login)
-title.Size = UDim2.new(1,0,0,30)
-title.Text = "Enter Password"
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.GothamBold
+local function getHWID()
+    if not isfile("hwid.txt") then
+        local id = tostring(math.random(1000,9999))
+        writefile("hwid.txt", id)
+        return id
+    end
+    return readfile("hwid.txt")
+end
 
-local box = Instance.new("TextBox", login)
-box.Size = UDim2.new(0.8,0,0,35)
-box.Position = UDim2.new(0.1,0,0.4,0)
-box.PlaceholderText = "password..."
-box.Text = ""
-box.BackgroundColor3 = Color3.fromRGB(40,40,40)
-box.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", box)
+local HWID = getHWID()
+local VALID_KEY = "vandatdz-"..HWID
 
-local btn = Instance.new("TextButton", login)
-btn.Size = UDim2.new(0.5,0,0,30)
-btn.Position = UDim2.new(0.25,0,0.75,0)
-btn.Text = "LOGIN"
-btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-btn.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", btn)
+local function saveKey()
+    local data = {key = VALID_KEY, time = os.time()}
+    writefile(FILE, HttpService:JSONEncode(data))
+end
 
--- SETTINGS
+local function loadKey()
+    if not isfile(FILE) then return false end
+    local data = HttpService:JSONDecode(readfile(FILE))
+
+    if data.key ~= VALID_KEY then return false end
+
+    local diff = os.time() - data.time
+    if diff <= 86400 then
+        return true, 86400 - diff
+    else
+        delfile(FILE)
+        return false
+    end
+end
+
+local function formatTime(sec)
+    local h = math.floor(sec/3600)
+    local m = math.floor((sec%3600)/60)
+    local s = sec%60
+    return string.format("%02d:%02d:%02d", h,m,s)
+end
+
+--================ MENU =================--
+
 local ESP = true
 local LINE = true
 
--- MAIN MENU
 local function createMenu()
-    login:Destroy()
+    local gui = Instance.new("ScreenGui", game.CoreGui)
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,220,0,170)
+    main.Size = UDim2.new(0,240,0,220)
     main.Position = UDim2.new(0,20,0,200)
     main.BackgroundColor3 = Color3.fromRGB(25,25,25)
     Instance.new("UICorner", main)
 
-    -- Title
+    -- TITLE
     local title = Instance.new("TextLabel", main)
     title.Size = UDim2.new(1,0,0,30)
     title.Text = "Menu VandatdzESP"
@@ -64,7 +72,7 @@ local function createMenu()
     title.TextColor3 = Color3.fromRGB(0,255,255)
     title.Font = Enum.Font.GothamBold
 
-    -- Credit
+    -- CREDIT
     local credit = Instance.new("TextLabel", main)
     credit.Size = UDim2.new(1,0,0,20)
     credit.Position = UDim2.new(0,0,1,-20)
@@ -72,10 +80,55 @@ local function createMenu()
     credit.BackgroundTransparency = 1
     credit.TextColor3 = Color3.fromRGB(150,150,150)
 
-    -- Switch
-    local function switch(name,y,state,callback)
+    -- KEY HIỂN THỊ
+    local keyLabel = Instance.new("TextLabel", main)
+    keyLabel.Size = UDim2.new(1,0,0,20)
+    keyLabel.Position = UDim2.new(0,0,0,30)
+    keyLabel.BackgroundTransparency = 1
+    keyLabel.TextColor3 = Color3.fromRGB(255,255,0)
+    keyLabel.Text = "Key: "..VALID_KEY
+
+    -- COPY KEY
+    local copyBtn = Instance.new("TextButton", main)
+    copyBtn.Size = UDim2.new(0.6,0,0,25)
+    copyBtn.Position = UDim2.new(0.2,0,0,55)
+    copyBtn.Text = "COPY KEY"
+    copyBtn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    copyBtn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", copyBtn)
+
+    copyBtn.MouseButton1Click:Connect(function()
+        if setclipboard then
+            setclipboard(VALID_KEY)
+            copyBtn.Text = "Đã copy!"
+            wait(1)
+            copyBtn.Text = "COPY KEY"
+        end
+    end)
+
+    -- TIME
+    local timeText = Instance.new("TextLabel", main)
+    timeText.Size = UDim2.new(1,0,0,20)
+    timeText.Position = UDim2.new(0,0,0,85)
+    timeText.BackgroundTransparency = 1
+    timeText.TextColor3 = Color3.fromRGB(0,255,0)
+
+    spawn(function()
+        while true do
+            local valid, t = loadKey()
+            if not valid then
+                timeText.Text = "Key hết hạn!"
+                break
+            end
+            timeText.Text = "Time: "..formatTime(t)
+            wait(1)
+        end
+    end)
+
+    -- BUTTON
+    local function button(name,y,state,callback)
         local b = Instance.new("TextButton", main)
-        b.Size = UDim2.new(0.8,0,0,35)
+        b.Size = UDim2.new(0.8,0,0,30)
         b.Position = UDim2.new(0.1,0,0,y)
         b.Text = name..": "..(state and "ON" or "OFF")
         b.BackgroundColor3 = Color3.fromRGB(40,40,40)
@@ -89,8 +142,8 @@ local function createMenu()
         end)
     end
 
-    switch("ESP",40,ESP,function(v) ESP=v end)
-    switch("LINE",85,LINE,function(v) LINE=v end)
+    button("ESP",110,ESP,function(v) ESP=v end)
+    button("LINE",150,LINE,function(v) LINE=v end)
 
     -- DRAG
     local drag, start, pos
@@ -114,65 +167,122 @@ local function createMenu()
             drag = false
         end
     end)
-
-    -- ESP
-    local function esp(p)
-        if p == LocalPlayer then return end
-
-        local box = Drawing.new("Square")
-        local line = Drawing.new("Line")
-        local text = Drawing.new("Text")
-
-        text.Size = 12
-        text.Center = true
-        text.Outline = true
-
-        RunService.RenderStepped:Connect(function()
-            local c = p.Character
-            if c and c:FindFirstChild("HumanoidRootPart") then
-                local hrp = c.HumanoidRootPart
-                local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
-
-                if vis and ESP then
-                    local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-                    local scale = math.clamp(1/(dist/300),0.3,1)
-
-                    box.Size = Vector2.new(30*scale,50*scale)
-                    box.Position = Vector2.new(pos.X-(15*scale),pos.Y-(25*scale))
-                    box.Color = Color3.fromRGB(255,0,0)
-                    box.Visible = true
-
-                    text.Position = Vector2.new(pos.X,pos.Y-(30*scale))
-                    text.Text = p.Name.." ["..math.floor(dist).."m]"
-                    text.Visible = true
-
-                    if LINE then
-                        line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
-                        line.To = Vector2.new(pos.X,pos.Y)
-                        line.Color = Color3.fromRGB(0,255,0)
-                        line.Visible = true
-                    else
-                        line.Visible = false
-                    end
-                else
-                    box.Visible = false
-                    line.Visible = false
-                    text.Visible = false
-                end
-            end
-        end)
-    end
-
-    for _,v in pairs(Players:GetPlayers()) do esp(v) end
-    Players.PlayerAdded:Connect(esp)
 end
 
--- LOGIN CHECK
-btn.MouseButton1Click:Connect(function()
-    if box.Text == PASSWORD then
-        createMenu()
-    else
-        box.Text = ""
-        box.PlaceholderText = "Sai mật khẩu!"
+--================ ESP =================--
+
+local function esp(p)
+    if p == LocalPlayer then return end
+
+    local box = Drawing.new("Square")
+    local line = Drawing.new("Line")
+    local text = Drawing.new("Text")
+
+    local bones = {
+        {"Head","UpperTorso"},{"UpperTorso","LowerTorso"},
+        {"UpperTorso","LeftUpperArm"},{"LeftUpperArm","LeftLowerArm"},
+        {"UpperTorso","RightUpperArm"},{"RightUpperArm","RightLowerArm"},
+        {"LowerTorso","LeftUpperLeg"},{"LeftUpperLeg","LeftLowerLeg"},
+        {"LowerTorso","RightUpperLeg"},{"RightUpperLeg","RightLowerLeg"}
+    }
+
+    local skel = {}
+    for i=1,#bones do
+        local l = Drawing.new("Line")
+        l.Color = Color3.fromRGB(255,255,255)
+        table.insert(skel,l)
     end
-end)
+
+    RunService.RenderStepped:Connect(function()
+        local c = p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            local hrp = c.HumanoidRootPart
+            local pos, vis = Camera:WorldToViewportPoint(hrp.Position)
+
+            if vis and ESP then
+                local dist = (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+                local scale = math.clamp(1/(dist/300),0.3,1)
+
+                box.Size = Vector2.new(30*scale,50*scale)
+                box.Position = Vector2.new(pos.X-(15*scale),pos.Y-(25*scale))
+                box.Color = Color3.fromRGB(255,0,0)
+                box.Visible = true
+
+                text.Position = Vector2.new(pos.X,pos.Y-(30*scale))
+                text.Text = p.Name.." ["..math.floor(dist).."m]"
+                text.Visible = true
+
+                if LINE then
+                    line.From = Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y)
+                    line.To = Vector2.new(pos.X,pos.Y)
+                    line.Color = Color3.fromRGB(0,255,0)
+                    line.Visible = true
+                else
+                    line.Visible = false
+                end
+
+                for i,b in ipairs(bones) do
+                    local p1 = c:FindFirstChild(b[1])
+                    local p2 = c:FindFirstChild(b[2])
+                    if p1 and p2 then
+                        local a,v1 = Camera:WorldToViewportPoint(p1.Position)
+                        local b2,v2 = Camera:WorldToViewportPoint(p2.Position)
+                        if v1 and v2 then
+                            skel[i].From = Vector2.new(a.X,a.Y)
+                            skel[i].To = Vector2.new(b2.X,b2.Y)
+                            skel[i].Visible = true
+                        else
+                            skel[i].Visible = false
+                        end
+                    end
+                end
+
+            else
+                box.Visible = false
+                line.Visible = false
+                text.Visible = false
+                for _,l in pairs(skel) do l.Visible=false end
+            end
+        end
+    end)
+end
+
+--================ RUN =================--
+
+local valid = loadKey()
+
+if valid then
+    createMenu()
+    for _,v in pairs(Players:GetPlayers()) do esp(v) end
+    Players.PlayerAdded:Connect(esp)
+else
+    local gui = Instance.new("ScreenGui", game.CoreGui)
+    local frame = Instance.new("Frame", gui)
+    frame.Size = UDim2.new(0,260,0,160)
+    frame.Position = UDim2.new(0.5,-130,0.5,-80)
+    frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+    Instance.new("UICorner", frame)
+
+    local box = Instance.new("TextBox", frame)
+    box.Size = UDim2.new(0.8,0,0,35)
+    box.Position = UDim2.new(0.1,0,0.4,0)
+    box.PlaceholderText = "Nhập key..."
+
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0.5,0,0,30)
+    btn.Position = UDim2.new(0.25,0,0.75,0)
+    btn.Text = "LOGIN"
+
+    btn.MouseButton1Click:Connect(function()
+        if box.Text == VALID_KEY then
+            saveKey()
+            frame:Destroy()
+            createMenu()
+            for _,v in pairs(Players:GetPlayers()) do esp(v) end
+            Players.PlayerAdded:Connect(esp)
+        else
+            box.Text = ""
+            box.PlaceholderText = "Sai key!"
+        end
+    end)
+end
