@@ -1,325 +1,84 @@
--- === ALL-IN-ONE GUI: MỜ + FIX LAG + FPS/PING + ESP + HITBOX + AUTO KILL + AIMBOT ===
--- Nhấn INSERT để mở/đóng GUI
--- Đặt trong StarterPlayer → StarterPlayerScripts
+-- === SCRIPT HIỂN THỊ FPS + PING TRÊN MÀN HÌNH ===
+-- Đặt trong StarterPlayer → StarterPlayerScripts (LocalScript)
 
 local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
-local Camera = Workspace.CurrentCamera
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Biến
-local blurSize = 12
-local ESP_ENABLED = false
-local HITBOX_SIZE = 5
-local AUTO_KILL_ENABLED = false
-local AIMBOT_ENABLED = false
-local espTable = {}
-
--- Tạo Blur
-local blur = Instance.new("BlurEffect")
-blur.Name = "AllInOneBlur"
-blur.Size = blurSize
-blur.Enabled = true
-blur.Parent = Lighting
-
--- Fix Lag
-local function applyFixLag()
-    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 999999
-    Lighting.Brightness = 1
-    Lighting.ClockTime = 14
-
-    for _, v in pairs(Lighting:GetChildren()) do
-        if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("BloomEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") then
-            v:Destroy()
-        end
-    end
-
-    for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj:IsA("Model") and Players:GetPlayerFromCharacter(obj) then continue end
-        if obj:IsA("BasePart") or obj:IsA("MeshPart") then
-            if not Players:GetPlayerFromCharacter(obj.Parent) then
-                obj.Material = Enum.Material.SmoothPlastic
-                obj.CastShadow = false
-                obj.Reflectance = 0
-            end
-        elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
-            obj:Destroy()
-        elseif obj:IsA("Decal") or obj:IsA("Texture") then
-            if not Players:GetPlayerFromCharacter(obj.Parent) then
-                obj:Destroy()
-            end
-        end
-    end
-end
-
-applyFixLag()
-
--- GUI
+-- Tạo GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 360, 0, 480)
-frame.Position = UDim2.new(0.5, -180, 0.3, 0)
+frame.Size = UDim2.new(0, 140, 0, 70)
+frame.Position = UDim2.new(1, -160, 0, 20)  -- Góc trên bên phải
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BackgroundTransparency = 0.3
+frame.BorderSizePixel = 0
 frame.Active = true
-frame.Draggable = true
-frame.Visible = false
+frame.Draggable = true   -- Có thể kéo di chuyển
 frame.Parent = screenGui
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 45)
-title.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-title.Text = "🔥 ALL-IN-ONE CHEAT"
-title.TextColor3 = Color3.new(1,1,1)
-title.TextSize = 18
-title.Font = Enum.Font.GothamBold
-title.Parent = frame
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
 
--- FPS + Ping
 local fpsLabel = Instance.new("TextLabel")
-fpsLabel.Size = UDim2.new(1, 0, 0, 25)
-fpsLabel.Position = UDim2.new(0, 0, 0, 50)
+fpsLabel.Size = UDim2.new(1, 0, 0.5, 0)
 fpsLabel.BackgroundTransparency = 1
-fpsLabel.Text = "FPS: --- | Ping: --- ms"
+fpsLabel.Text = "FPS: ---"
 fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-fpsLabel.TextSize = 15
-fpsLabel.Font = Enum.Font.Gotham
+fpsLabel.TextSize = 16
+fpsLabel.Font = Enum.Font.GothamBold
 fpsLabel.Parent = frame
 
--- Slider mờ
-local blurLabel = Instance.new("TextLabel")
-blurLabel.Size = UDim2.new(1, 0, 0, 25)
-blurLabel.Position = UDim2.new(0, 0, 0, 80)
-blurLabel.BackgroundTransparency = 1
-blurLabel.Text = "Độ mờ: " .. blurSize
-blurLabel.TextColor3 = Color3.new(1,1,1)
-blurLabel.Parent = frame
+local pingLabel = Instance.new("TextLabel")
+pingLabel.Size = UDim2.new(1, 0, 0.5, 0)
+pingLabel.Position = UDim2.new(0, 0, 0.5, 0)
+pingLabel.BackgroundTransparency = 1
+pingLabel.Text = "Ping: --- ms"
+pingLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+pingLabel.TextSize = 16
+pingLabel.Font = Enum.Font.GothamBold
+pingLabel.Parent = frame
 
-local sliderBG = Instance.new("Frame")
-sliderBG.Size = UDim2.new(0.85, 0, 0, 8)
-sliderBG.Position = UDim2.new(0.075, 0, 0, 110)
-sliderBG.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-sliderBG.Parent = frame
+-- Tính FPS chính xác
+local fps = 0
+RunService.RenderStepped:Connect(function()
+    fps = fps + 1
+end)
 
-local slider = Instance.new("TextButton")
-slider.Size = UDim2.new(0, 20, 0, 20)
-slider.Position = UDim2.new(0.35, 0, 0, 104)
-slider.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-slider.Text = ""
-slider.Parent = frame
-
--- Nút chức năng
-local espBtn = Instance.new("TextButton")
-espBtn.Size = UDim2.new(0.9, 0, 0, 35)
-espBtn.Position = UDim2.new(0.05, 0, 0, 150)
-espBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-espBtn.Text = "ESP: OFF"
-espBtn.TextColor3 = Color3.new(1,1,1)
-espBtn.Parent = frame
-
-local hitLabel = Instance.new("TextLabel")
-hitLabel.Size = UDim2.new(1, 0, 0, 25)
-hitLabel.Position = UDim2.new(0, 0, 0, 195)
-hitLabel.BackgroundTransparency = 1
-hitLabel.Text = "Hitbox Size: 5"
-hitLabel.TextColor3 = Color3.new(1,1,1)
-hitLabel.Parent = frame
-
-local hitBoxInput = Instance.new("TextBox")
-hitBoxInput.Size = UDim2.new(0.9, 0, 0, 30)
-hitBoxInput.Position = UDim2.new(0.05, 0, 0, 220)
-hitBoxInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-hitBoxInput.Text = "5"
-hitBoxInput.TextColor3 = Color3.new(1,1,1)
-hitBoxInput.Parent = frame
-
-local killBtn = Instance.new("TextButton")
-killBtn.Size = UDim2.new(0.9, 0, 0, 35)
-killBtn.Position = UDim2.new(0.05, 0, 0, 260)
-killBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-killBtn.Text = "Auto Kill: OFF"
-killBtn.TextColor3 = Color3.new(1,1,1)
-killBtn.Parent = frame
-
-local aimbotBtn = Instance.new("TextButton")
-aimbotBtn.Size = UDim2.new(0.9, 0, 0, 35)
-aimbotBtn.Position = UDim2.new(0.05, 0, 0, 305)
-aimbotBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-aimbotBtn.Text = "Aimbot Tự Động: OFF"
-aimbotBtn.TextColor3 = Color3.new(1,1,1)
-aimbotBtn.Parent = frame
-
-local fixBtn = Instance.new("TextButton")
-fixBtn.Size = UDim2.new(0.9, 0, 0, 35)
-fixBtn.Position = UDim2.new(0.05, 0, 0, 350)
-fixBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-fixBtn.Text = "Fix Lag Mạnh"
-fixBtn.TextColor3 = Color3.new(1,1,1)
-fixBtn.Parent = frame
-
--- FPS + Ping
+-- Cập nhật FPS và Ping mỗi giây
 spawn(function()
-    local fps = 0
-    RunService.RenderStepped:Connect(function() fps = fps + 1 end)
     while true do
         wait(1)
-        local currentFps = fps
+        
+        -- Cập nhật FPS
+        fpsLabel.Text = "FPS: " .. fps
+        if fps >= 55 then
+            fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 100)   -- Xanh (tốt)
+        elseif fps >= 30 then
+            fpsLabel.TextColor3 = Color3.fromRGB(255, 200, 0)   -- Vàng
+        else
+            fpsLabel.TextColor3 = Color3.fromRGB(255, 50, 50)   -- Đỏ (lag)
+        end
         fps = 0
-        local ping = math.floor(player:GetNetworkPing() * 1000)
-        fpsLabel.Text = "FPS: " .. currentFps .. " | Ping: " .. ping .. " ms"
-    end
-end)
-
--- Kéo slider mờ
-local dragging = false
-slider.MouseButton1Down:Connect(function() dragging = true end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-end)
-
-RunService.RenderStepped:Connect(function()
-    if dragging then
-        local mouseX = UserInputService:GetMouseLocation().X
-        local pos = math.clamp((mouseX - sliderBG.AbsolutePosition.X) / sliderBG.AbsoluteSize.X, 0, 1)
-        slider.Position = UDim2.new(pos, 0, 0, 104)
-        blurSize = math.floor(pos * 30)
-        blur.Size = blurSize
-        blurLabel.Text = "Độ mờ: " .. blurSize
-    end
-end)
-
--- ESP
-local function createESP(char)
-    if espTable[char] or char == player.Character then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    local box = Instance.new("BoxHandleAdornment")
-    box.Adornee = root
-    box.Size = root.Size + Vector3.new(2,4,2)
-    box.Color3 = Color3.fromRGB(255,0,0)
-    box.Transparency = 0.5
-    box.AlwaysOnTop = true
-    box.Parent = root
-
-    espTable[char] = box
-end
-
-local function toggleESP()
-    ESP_ENABLED = not ESP_ENABLED
-    espBtn.Text = "ESP: " .. (ESP_ENABLED and "ON" or "OFF")
-    espBtn.BackgroundColor3 = ESP_ENABLED and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
-
-    if ESP_ENABLED then
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr.Character then createESP(plr.Character) end
-        end
-    else
-        for _, v in pairs(espTable) do v:Destroy() end
-        espTable = {}
-    end
-end
-
-espBtn.MouseButton1Click:Connect(toggleESP)
-
--- Hitbox
-hitBoxInput.FocusLost:Connect(function()
-    HITBOX_SIZE = tonumber(hitBoxInput.Text) or 5
-    hitLabel.Text = "Hitbox Size: " .. HITBOX_SIZE
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr \~= player and plr.Character then
-            for _, part in pairs(plr.Character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name \~= "HumanoidRootPart" then
-                    part.Size = Vector3.new(HITBOX_SIZE, HITBOX_SIZE, HITBOX_SIZE)
-                end
-            end
+        
+        -- Cập nhật Ping
+        local ping = player:GetNetworkPing() * 1000  -- Chuyển sang ms
+        pingLabel.Text = "Ping: " .. math.floor(ping) .. " ms"
+        
+        if ping <= 80 then
+            pingLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        elseif ping <= 150 then
+            pingLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+        else
+            pingLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
         end
     end
 end)
 
--- Auto Kill
-local function autoKillLoop()
-    while AUTO_KILL_ENABLED do
-        wait(0.1)
-        if not player.Character then continue end
-        local closest, minDist = nil, math.huge
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr \~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local dist = (player.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
-                if dist < minDist and dist < 40 then
-                    minDist = dist
-                    closest = plr.Character
-                end
-            end
-        end
-        if closest and closest:FindFirstChild("Humanoid") then
-            closest.Humanoid.Health = 0
-        end
-    end
-end
-
-killBtn.MouseButton1Click:Connect(function()
-    AUTO_KILL_ENABLED = not AUTO_KILL_ENABLED
-    killBtn.Text = "Auto Kill: " .. (AUTO_KILL_ENABLED and "ON" or "OFF")
-    killBtn.BackgroundColor3 = AUTO_KILL_ENABLED and Color3.fromRGB(170,0,0) or Color3.fromRGB(40,40,40)
-    if AUTO_KILL_ENABLED then spawn(autoKillLoop) end
-end)
-
--- AIMBOT TỰ ĐỘNG
-local function aimbotLoop()
-    while AIMBOT_ENABLED do
-        wait(0.015) -- mượt mà
-        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then continue end
-
-        local closest, minDist = nil, math.huge
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr \~= player and plr.Character and plr.Character:FindFirstChild("Head") then
-                local dist = (player.Character.HumanoidRootPart.Position - plr.Character.Head.Position).Magnitude
-                if dist < minDist and dist < 200 then
-                    minDist = dist
-                    closest = plr.Character.Head
-                end
-            end
-        end
-
-        if closest then
-            local targetCFrame = CFrame.new(Camera.CFrame.Position, closest.Position)
-            Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, 0.85) -- mượt
-        end
-    end
-end
-
-aimbotBtn.MouseButton1Click:Connect(function()
-    AIMBOT_ENABLED = not AIMBOT_ENABLED
-    aimbotBtn.Text = "Aimbot Tự Động: " .. (AIMBOT_ENABLED and "ON" or "OFF")
-    aimbotBtn.BackgroundColor3 = AIMBOT_ENABLED and Color3.fromRGB(170,0,0) or Color3.fromRGB(40,40,40)
-    
-    if AIMBOT_ENABLED then
-        spawn(aimbotLoop)
-    end
-end)
-
--- Fix Lag
-fixBtn.MouseButton1Click:Connect(function()
-    applyFixLag()
-    game.StarterGui:SetCore("SendNotification", {Title = "Fix Lag"; Text = "Đã tối ưu mạnh!"; Duration = 3})
-end)
-
--- Mở GUI bằng INSERT
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.Insert then
-        frame.Visible = not frame.Visible
-    end
-end)
-
-print("✅ SCRIPT ALL-IN-ONE ĐÃ HOÀN THÀNH! Nhấn INSERT để mở GUI.")
-print("Aimbot tự động đã được thêm - Dùng cẩn thận!")
+print("✅ Đã hiển thị FPS + Ping trên màn hình!")
