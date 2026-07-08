@@ -121,7 +121,7 @@ UICorner.CornerRadius = UDim.new(1, 10)
 UICorner.Parent = ImageButton
 
 ImageButton.MouseButton1Down:Connect(function()
-	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.M, false, game)
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.End, false, game)
 end)
 
 -- 🟣 Giao diện Fluent
